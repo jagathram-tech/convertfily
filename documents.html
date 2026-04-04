@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Converter — convertfily</title>
+    <meta name="description" content="Free online document converter. Convert TXT to HTML, JSON to CSV, Markdown to HTML and more. 100% free, no upload.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%233b82f6' width='100' height='100' rx='20'/><path d='M75 60v20a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5V40a5 5 0 0 1 10 0v30h45V60a5 5 0 0 1 5-5h0a5 5 0 0 1 0 10H30v10h40a5 5 0 0 1 5 5v0a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5V60' fill='white'/></svg>">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --primary-light: #eff6ff;
+            --bg: #ffffff;
+            --surface: #f8fafc;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2; }
+
+        .nav-links {
+            display: flex;
+            gap: 4px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover { color: var(--text); background: var(--surface); }
+        .nav-link.active { color: var(--primary); background: var(--primary-light); }
+
+        .badge {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--surface);
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+        }
+
+        .main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .page-title { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px; text-align: center; }
+        .page-desc { font-size: 16px; color: var(--text-secondary); text-align: center; margin-bottom: 32px; }
+
+        .formats-supported { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 32px; }
+        .format-tag { font-size: 13px; font-weight: 600; background: var(--surface); color: var(--text-secondary); padding: 6px 14px; border-radius: 999px; }
+
+        .converter-box { background: var(--surface); border-radius: 16px; padding: 28px; }
+
+        .dropzone {
+            padding: 56px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg);
+            border-radius: var(--radius);
+            border: 2px dashed var(--border);
+            margin-bottom: 20px;
+        }
+
+        .dropzone:hover { border-color: var(--primary); background: var(--primary-light); }
+        .dropzone.dragover { border-color: var(--primary); background: var(--primary-light); }
+        .dropzone.has-file { border-style: solid; border-color: var(--success); background: var(--success-light); }
+
+        .dropzone-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--primary-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .dropzone-icon svg { width: 28px; height: 28px; stroke: var(--primary); fill: none; stroke-width: 1.8; }
+        .dropzone-text { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        .dropzone-hint { font-size: 13px; color: var(--text-secondary); }
+
+        #fileInput { display: none; }
+
+        .preview-section { display: none; margin-bottom: 20px; }
+        .preview-section.active { display: block; }
+
+        .preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .preview-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .remove-btn {
+            background: none;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .remove-btn:hover { background: #fee2e2; color: #ef4444; }
+
+        .preview-content-wrap {
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            max-height: 250px;
+            overflow: auto;
+            margin-bottom: 12px;
+        }
+
+        .preview-content { font-size: 13px; color: var(--text); white-space: pre-wrap; word-break: break-all; font-family: monospace; }
+
+        .file-details { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .file-name { font-weight: 500; color: var(--text); word-break: break-all; font-size: 14px; }
+        .file-size { color: var(--text-secondary); font-size: 14px; }
+        .file-format { background: var(--primary-light); color: var(--primary); padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+
+        .controls { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: end; margin-bottom: 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .control-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .dropdown { position: relative; width: 100%; z-index: 100; }
+
+        .dropdown-trigger {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            background: var(--bg);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dropdown-trigger:hover { border-color: #cbd5e1; }
+        .dropdown.open .dropdown-trigger { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .dropdown-trigger .chevron { width: 16px; height: 16px; stroke: var(--text-secondary); transition: transform 0.2s; flex-shrink: 0; }
+        .dropdown.open .dropdown-trigger .chevron { transform: rotate(180deg); }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: 6px;
+            display: none;
+        }
+
+        .dropdown.open .dropdown-menu { display: block; }
+        .dropdown-item { padding: 10px 14px; font-size: 14px; font-weight: 500; color: var(--text); border-radius: 6px; cursor: pointer; }
+        .dropdown-item:hover { background: var(--surface); }
+        .dropdown-item.selected { color: var(--primary); background: var(--primary-light); font-weight: 600; }
+
+        .arrow-icon { display: flex; align-items: center; justify-content: center; padding-bottom: 10px; }
+        .arrow-icon svg { width: 22px; height: 22px; stroke: var(--primary); fill: none; stroke-width: 2.5; }
+
+        .convert-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .convert-btn:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4); }
+        .convert-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .convert-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        .loading { display: none; text-align: center; padding: 40px; }
+        .loading.active { display: block; }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 14px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+
+        .result-section { display: none; padding: 20px; background: var(--success-light); border-radius: var(--radius); margin-top: 20px; }
+        .result-section.active { display: block; }
+
+        .result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .result-icon { width: 26px; height: 26px; background: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .result-icon svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 3; }
+        .result-title { font-size: 15px; font-weight: 700; color: #15803d; }
+
+        .result-content-wrap { background: white; border-radius: var(--radius-sm); padding: 16px; max-height: 250px; overflow: auto; margin-bottom: 16px; }
+        .result-content { font-size: 13px; color: var(--text); white-space: pre-wrap; word-break: break-all; font-family: monospace; }
+
+        .result-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .stat-box { background: white; border-radius: var(--radius-sm); padding: 14px; text-align: center; }
+        .stat-val { font-size: 18px; font-weight: 700; color: var(--text); }
+        .stat-lbl { font-size: 11px; color: var(--text-secondary); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.3px; }
+
+        .download-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .download-btn:hover { background: #059669; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
+        .download-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        footer { background: var(--surface); border-top: 1px solid var(--border); padding: 24px; text-align: center; }
+        footer p { font-size: 13px; color: var(--text-secondary); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .badge { display: none; }
+            .controls { grid-template-columns: 1fr; }
+            .arrow-icon { transform: rotate(90deg); padding: 4px 0; justify-content: center; }
+            .result-stats { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        convertfily
+    </a>
+    <nav class="nav-links">
+        <a href="universal.html" class="nav-link">Universal</a>
+        <a href="images.html" class="nav-link">Images</a>
+        <a href="pdf.html" class="nav-link">PDF</a>
+        <a href="fusion.html" class="nav-link">Doc → PDF</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="audio.html" class="nav-link">Audio</a>
+    </nav>
+    <span class="badge">100% Free</span>
+</header>
+
+<main class="main">
+    <h1 class="page-title">Document Converter</h1>
+    <p class="page-desc">Convert text documents between TXT, HTML, Markdown, JSON, XML, CSV, and PDF formats.</p>
+    
+    <div class="formats-supported">
+        <span class="format-tag">TXT</span>
+        <span class="format-tag">HTML</span>
+        <span class="format-tag">Markdown</span>
+        <span class="format-tag">JSON</span>
+        <span class="format-tag">XML</span>
+        <span class="format-tag">CSV</span>
+        <span class="format-tag">PDF</span>
+    </div>
+
+    <div class="converter-box">
+        <div class="dropzone" id="dropzone">
+            <div class="dropzone-icon">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="dropzone-text">Drop your document here</div>
+            <div class="dropzone-hint">or click to browse (.txt, .html, .md, .json, .xml, .csv)</div>
+        </div>
+        <input type="file" id="fileInput" accept=".txt,.html,.htm,.md,.json,.xml,.csv,.pdf">
+
+        <div class="preview-section" id="previewSection">
+            <div class="preview-header">
+                <span class="preview-label">Selected Document</span>
+                <button class="remove-btn" id="removeBtn">Remove</button>
+            </div>
+            <div class="preview-content-wrap">
+                <div class="preview-content" id="previewContent"></div>
+            </div>
+            <div class="file-details">
+                <span class="file-name" id="fileName"></span>
+                <span class="file-size" id="fileSize"></span>
+                <span class="file-format" id="fileFormat"></span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label class="control-label">From</label>
+                <div class="dropdown" id="sourceDropdown">
+                    <button class="dropdown-trigger" type="button">
+                        <span class="dropdown-value">Auto-detect</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item" data-value="">Auto-detect</div>
+                        <div class="dropdown-item" data-value="text/plain">TXT</div>
+                        <div class="dropdown-item" data-value="text/html">HTML</div>
+                        <div class="dropdown-item" data-value="text/markdown">Markdown</div>
+                        <div class="dropdown-item" data-value="application/json">JSON</div>
+                        <div class="dropdown-item" data-value="text/xml">XML</div>
+                        <div class="dropdown-item" data-value="text/csv">CSV</div>
+                    </div>
+                </div>
+            </div>
+            <div class="arrow-icon">
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+            <div class="control-group">
+                <label class="control-label">To</label>
+                <div class="dropdown" id="targetDropdown">
+                    <button class="dropdown-trigger" type="button">
+                        <span class="dropdown-value">HTML</span>
+                        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item" data-value="text/plain">TXT</div>
+                        <div class="dropdown-item selected" data-value="text/html">HTML</div>
+                        <div class="dropdown-item" data-value="text/markdown">Markdown</div>
+                        <div class="dropdown-item" data-value="application/json">JSON</div>
+                        <div class="dropdown-item" data-value="text/xml">XML</div>
+                        <div class="dropdown-item" data-value="text/csv">CSV</div>
+                        <div class="dropdown-item" data-value="application/pdf">PDF</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="convert-btn" id="convertBtn" disabled>
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Convert Document
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Converting your document...</div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-header">
+                <div class="result-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <span class="result-title">Conversion Complete!</span>
+            </div>
+            <div class="result-content-wrap">
+                <div class="result-content" id="resultContent"></div>
+            </div>
+            <div class="result-stats">
+                <div class="stat-box"><div class="stat-val" id="originalSize">-</div><div class="stat-lbl">Original</div></div>
+                <div class="stat-box"><div class="stat-val" id="newSize">-</div><div class="stat-lbl">New Size</div></div>
+                <div class="stat-box"><div class="stat-val" id="changeRate">-</div><div class="stat-lbl">Change</div></div>
+            </div>
+            <button class="download-btn" id="downloadBtn">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download Document
+            </button>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <p>convertfily — All conversions happen locally in your browser.</p>
+</footer>
+
+<script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const previewSection = document.getElementById('previewSection');
+    const previewContent = document.getElementById('previewContent');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const fileFormat = document.getElementById('fileFormat');
+    const removeBtn = document.getElementById('removeBtn');
+    const targetDropdown = document.getElementById('targetDropdown');
+    const convertBtn = document.getElementById('convertBtn');
+    const loading = document.getElementById('loading');
+    const resultSection = document.getElementById('resultSection');
+    const resultContent = document.getElementById('resultContent');
+    const originalSizeEl = document.getElementById('originalSize');
+    const newSizeEl = document.getElementById('newSize');
+    const changeRateEl = document.getElementById('changeRate');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let currentFile = null;
+    let currentContent = '';
+    let convertedBlob = null;
+    let originalFileSize = 0;
+
+    function formatSize(b) {
+        if (b < 1024) return b + ' B';
+        if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+        return (b / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    document.querySelectorAll('.dropdown').forEach(dropdown => {
+        const trigger = dropdown.querySelector('.dropdown-trigger');
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.dropdown.open').forEach(d => { if (d !== dropdown) d.classList.remove('open'); });
+            dropdown.classList.toggle('open');
+        });
+        dropdown.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                dropdown.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                dropdown.querySelector('.dropdown-value').textContent = item.textContent;
+                dropdown.dataset.value = item.dataset.value;
+                dropdown.classList.remove('open');
+            });
+        });
+    });
+
+    document.addEventListener('click', () => { document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open')); });
+
+    function handleFile(file) {
+        if (!file) return;
+        currentFile = file;
+        originalFileSize = file.size;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            currentContent = e.target.result;
+            previewContent.textContent = currentContent.substring(0, 3000);
+            fileName.textContent = file.name;
+            fileSize.textContent = formatSize(file.size);
+            fileFormat.textContent = file.name.split('.').pop().toUpperCase();
+        };
+        reader.readAsText(file);
+
+        previewSection.classList.add('active');
+        convertBtn.disabled = false;
+        resultSection.classList.remove('active');
+        dropzone.classList.add('has-file');
+    }
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+    removeBtn.addEventListener('click', () => {
+        currentFile = null;
+        currentContent = '';
+        fileInput.value = '';
+        previewSection.classList.remove('active');
+        convertBtn.disabled = true;
+        resultSection.classList.remove('active');
+        dropzone.classList.remove('has-file');
+    });
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function htmlToMarkdown(html) {
+        return html
+            .replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n')
+            .replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n')
+            .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n')
+            .replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n')
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<[^>]*>/g, '')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>');
+    }
+
+    function stripHtml(html) {
+        return html.replace(/<[^>]*>/g, '');
+    }
+
+    convertBtn.addEventListener('click', async () => {
+        if (!currentFile) return;
+        convertBtn.disabled = true;
+        loading.classList.add('active');
+        resultSection.classList.remove('active');
+
+        await new Promise(r => setTimeout(r, 200));
+
+        try {
+            const targetMime = targetDropdown.dataset.value || 'text/html';
+            let output = currentContent;
+
+            if (targetMime === 'text/html') {
+                if (!currentContent.includes('<html') && !currentContent.includes('<!DOCTYPE')) {
+                    output = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>Converted</title>\n</head>\n<body>\n<pre>${escapeHtml(currentContent)}</pre>\n</body>\n</html>`;
+                }
+            } else if (targetMime === 'text/markdown') {
+                if (currentContent.includes('<html') || currentContent.includes('<!DOCTYPE')) {
+                    output = htmlToMarkdown(currentContent);
+                }
+            } else if (targetMime === 'text/plain') {
+                if (currentContent.includes('<html') || currentContent.includes('<!DOCTYPE')) {
+                    output = stripHtml(currentContent);
+                }
+            } else if (targetMime === 'application/pdf') {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFont('helvetica');
+                doc.setFontSize(12);
+                
+                let plainText = currentContent;
+                if (currentContent.includes('<html') || currentContent.includes('<!DOCTYPE')) {
+                    plainText = stripHtml(currentContent);
+                }
+                
+                const lines = doc.splitTextToSize(plainText, 180);
+                doc.text(lines, 15, 20);
+                
+                convertedBlob = doc.output('blob');
+                resultContent.textContent = plainText.substring(0, 3000);
+                
+                originalSizeEl.textContent = formatSize(originalFileSize);
+                newSizeEl.textContent = formatSize(convertedBlob.size);
+                
+                const pct = ((convertedBlob.size - originalFileSize) / originalFileSize * 100);
+                changeRateEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(1) + '%';
+                changeRateEl.style.color = pct > 0 ? '#ef4444' : '#10b981';
+                
+                loading.classList.remove('active');
+                resultSection.classList.add('active');
+                convertBtn.disabled = false;
+                return;
+            }
+
+            convertedBlob = new Blob([output], { type: targetMime });
+
+            resultContent.textContent = output.substring(0, 3000);
+            originalSizeEl.textContent = formatSize(originalFileSize);
+            newSizeEl.textContent = formatSize(convertedBlob.size);
+
+            const pct = ((convertedBlob.size - originalFileSize) / originalFileSize * 100);
+            changeRateEl.textContent = (pct > 0 ? '+' : '') + pct.toFixed(1) + '%';
+            changeRateEl.style.color = pct > 0 ? '#ef4444' : '#10b981';
+
+            loading.classList.remove('active');
+            resultSection.classList.add('active');
+
+        } catch (err) {
+            console.error(err);
+            alert('Conversion failed. Please try again.');
+            loading.classList.remove('active');
+        }
+
+        convertBtn.disabled = false;
+    });
+
+    downloadBtn.addEventListener('click', () => {
+        if (!convertedBlob || !currentFile) return;
+        const targetMime = targetDropdown.dataset.value || 'text/html';
+        const extMap = {
+            'text/plain': 'txt',
+            'text/html': 'html',
+            'text/markdown': 'md',
+            'application/json': 'json',
+            'text/xml': 'xml',
+            'text/csv': 'csv',
+            'application/pdf': 'pdf'
+        };
+        const ext = extMap[targetMime] || 'txt';
+        const name = currentFile.name.replace(/\.[^/.]+$/, '') + '.' + ext;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(convertedBlob);
+        a.download = name;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    });
+</script>
+
+</body>
+</html>

@@ -3,43 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document to PDF Converter (Fusion) — convertfily</title>
-    <meta name="description" content="Easily convert TXT, HTML, MD, JSON, and URLs to PDF securely. Your documents are handled locally for 100% privacy and lightning-speed processing.">
-    <meta name="keywords" content="document to pdf, txt to pdf, md to pdf, html to pdf, json to pdf, url to pdf, fusion converter">
+    <title>Document to PDF Fusion Converter - convertfily</title>
+    <meta name="description" content="Convert TXT, HTML, MD, JSON, and URLs directly into perfectly rendered PDFs. Ultra-fast, completely secure, offline processing.">
+    <meta name="keywords" content="document to pdf, txt to pdf, md to pdf, html to pdf, json to pdf, url to pdf, fusion converter, convertfily fusion">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#2563eb">
     <link rel="canonical" href="https://convertfily.vercel.app/fusion.html">
     <link rel="manifest" href="/site.webmanifest">
     
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://convertfily.vercel.app/fusion.html">
-    <meta property="og:title" content="Document to PDF Converter (Fusion) — convertfily">
-    <meta property="og:description" content="Easily convert TXT, HTML, MD, JSON, and URLs to PDF securely. Your documents are handled locally for 100% privacy and lightning-speed processing.">
-    <meta property="og:image" content="https://convertfily.vercel.app/cover-image.png">
+    <meta property="og:title" content="Document to PDF Fusion Converter - convertfily">
+    <meta property="og:description" content="Convert TXT, HTML, MD, JSON, and URLs directly into perfectly rendered PDFs. Ultra-fast, completely secure, offline processing.">
+    <meta property="og:image" content="https://convertfily.vercel.app/logo.png">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://convertfily.vercel.app/fusion.html">
-    <meta name="twitter:title" content="Document to PDF Converter (Fusion) — convertfily">
-    <meta name="twitter:description" content="Easily convert TXT, HTML, MD, JSON, and URLs to PDF securely. Your documents are handled locally for 100% privacy and lightning-speed processing.">
-    <meta name="twitter:image" content="https://convertfily.vercel.app/cover-image.png">
+    <meta name="twitter:title" content="Document to PDF Fusion Converter - convertfily">
+    <meta name="twitter:description" content="Convert TXT, HTML, MD, JSON, and URLs directly into perfectly rendered PDFs. Ultra-fast, completely secure, offline processing.">
+    <meta name="twitter:image" content="https://convertfily.vercel.app/logo.png">
 
-    <!-- JSON-LD SEO Structured Data -->
+    <!-- Software App SEO Schema -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
+      "@type": "SoftwareApplication",
       "name": "convertfily",
+      "description": "Convert TXT, HTML, MD, JSON, and URLs directly into perfectly rendered PDFs. Ultra-fast, completely secure, offline processing.",
       "url": "https://convertfily.vercel.app/fusion.html",
-      "description": "Easily convert TXT, HTML, MD, JSON, and URLs to PDF securely. Your documents are handled locally for 100% privacy and lightning-speed processing.",
       "applicationCategory": "BusinessApplication",
-      "operatingSystem": "All",
+      "operatingSystem": "Web Browser",
       "offers": {
         "@type": "Offer",
         "price": "0.00",
         "priceCurrency": "USD"
-      }
+      },
+      "featureList": [
+        "100% Offline Browser Processing",
+        "End-to-End Privacy without file uploads",
+        "Image format conversion (JPG, PNG, WebP)",
+        "Video format conversion (MP4, WebM)",
+        "Audio format conversion (MP3, WAV)",
+        "PDF creation from images and documents"
+      ]
+    }
+    </script>
+    
+    <!-- FAQ Rich Snippets for Maximum Reach in Google Search -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is convertfily (converfily) completely free and without ads?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, convertfily is an entirely free online file converter. We do not place hidden charges, and you can convert unlimited files."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are my files uploaded to your servers?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No! Unlike other competitors, convertfily processes your files 100% locally directly inside your web browser. This means your files never leave your computer, ensuring absolute privacy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What file formats are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Convertfily supports over 50 formats including PDF conversions, JPG/PNG imagery, MP4/MKV video variations, and MP3/WAV audio processing."
+          }
+        }
+      ]
     }
     </script>
     <!-- Open Graph / Facebook -->
@@ -48,8 +90,11 @@
     <!-- Open Graph / Facebook -->
     <!-- Twitter -->
     <!-- JSON-LD SEO Structured Data -->
+    <!-- Open Graph / Facebook -->
+    <!-- Twitter -->
+    <!-- JSON-LD SEO Structured Data -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%233b82f6' width='100' height='100' rx='20'/><path d='M75 60v20a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5V40a5 5 0 0 1 10 0v30h45V60a5 5 0 0 1 5-5h0a5 5 0 0 1 0 10H30v10h40a5 5 0 0 1 5 5v0a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5V60' fill='white'/></svg>">
+    <link rel="icon" href="logo.png" type="image/png">
     <style>
         :root {
             --primary: #3b82f6;
@@ -505,9 +550,7 @@
 
 <header>
     <a href="index.html" class="logo">
-        <div class="logo-icon">
-            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        </div>
+        <img src="logo.png" alt="convertfily logo" style="width: 34px; height: 34px; border-radius: 8px; object-fit: contain;">
         convertfily
     </a>
     <nav class="nav-links">

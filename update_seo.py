@@ -91,14 +91,14 @@ for filename, data in seo_data.items():
     <meta property="og:url" content="{full_url}">
     <meta property="og:title" content="{data['title']}">
     <meta property="og:description" content="{data['desc']}">
-    <meta property="og:image" content="{domain}/cover-image.png">
+    <meta property="og:image" content="{domain}/logo.png">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="{full_url}">
     <meta name="twitter:title" content="{data['title']}">
     <meta name="twitter:description" content="{data['desc']}">
-    <meta name="twitter:image" content="{domain}/cover-image.png">
+    <meta name="twitter:image" content="{domain}/logo.png">
 
     <!-- JSON-LD SEO Structured Data -->
     <script type="application/ld+json">

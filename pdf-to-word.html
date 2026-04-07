@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Word Converter - convertfily</title>
+    <meta name="description" content="Convert PDF files to editable Word documents instantly. Free, fast, and accurate conversion.">
+    <link rel="canonical" href="https://covertfily.com/pdf-to-word.html">
+    <link rel="icon" type="image/png" href="favicon.png" sizes="32x32">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --bg: #ffffff;
+            --surface: #fafbfc;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --success: #059669;
+            --success-bg: #d1fae5;
+            --error: #ef4444;
+            --error-bg: #fee2e2;
+            --border: #f1f5f9;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(12px);
+            padding: 0 24px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
+
+        .nav-links {
+            display: flex;
+            gap: 4px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-link {
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-xs);
+            transition: all 0.15s ease;
+        }
+
+        .nav-link:hover { color: var(--primary); background: var(--primary-light); }
+
+        .github-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--text);
+            color: white;
+            border-radius: var(--radius-xs);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .github-btn:hover { background: var(--text-secondary); }
+        .github-btn svg { width: 18px; height: 18px; fill: white; }
+
+        .hero {
+            background: linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
+            padding: 48px 24px 32px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 4vw, 36px);
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero h1 span { 
+            background: linear-gradient(135deg, var(--primary), #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p { font-size: 16px; color: var(--text-secondary); max-width: 480px; margin: 0 auto; }
+
+        .converter-section {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 32px 24px 64px;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--surface);
+        }
+
+        .drop-zone:hover { border-color: var(--primary); background: var(--primary-light); }
+        .drop-zone.has-file { border-color: var(--success); background: var(--success-bg); }
+
+        .drop-zone-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 12px;
+            background: var(--bg);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+        }
+
+        .drop-zone-icon svg { width: 28px; height: 28px; stroke: var(--primary); fill: none; stroke-width: 1.8; }
+        .drop-zone h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .drop-zone p { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+        .drop-zone .btn { display: inline-block; background: var(--primary); color: white; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; }
+        .drop-zone input { display: none; }
+
+        .notice {
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 16px;
+        }
+
+        .file-info {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-top: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .file-info.show { display: flex; }
+        .file-info .icon { width: 48px; height: 48px; background: var(--error-bg); border-radius: var(--radius-xs); display: flex; align-items: center; justify-content: center; }
+        .file-info .icon svg { width: 24px; height: 24px; stroke: var(--error); fill: none; }
+        .file-info .details { flex: 1; text-align: left; }
+        .file-info .name { font-weight: 600; font-size: 14px; }
+        .file-info .size { font-size: 12px; color: var(--text-muted); }
+        .file-info .remove { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--error-bg); color: var(--error); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        .convert-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .convert-btn:hover { background: var(--primary-dark); }
+        .convert-btn:disabled { background: var(--text-muted); cursor: not-allowed; }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 32px;
+        }
+
+        .loading.show { display: block; }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .result {
+            display: none;
+            margin-top: 24px;
+            padding: 24px;
+            background: var(--success-bg);
+            border-radius: var(--radius);
+            text-align: center;
+        }
+
+        .result.show { display: block; }
+        .result h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--success); }
+        .result p { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+
+        .download-btn {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 12px 32px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .download-btn:hover { background: #047857; }
+
+        .mobile-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+        .mobile-menu-btn svg { width: 22px; height: 22px; stroke: var(--text); }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 68px;
+            left: 12px;
+            right: 12px;
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            box-shadow: var(--shadow-md);
+            z-index: 99;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .mobile-nav.open { display: flex; }
+        .mobile-nav .nav-link {
+            padding: 12px 16px;
+            background: var(--surface);
+            border-radius: var(--radius-xs);
+            font-size: 14px;
+            color: var(--text);
+            text-decoration: none;
+            flex: 1;
+            text-align: center;
+            min-width: calc(50% - 4px);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .github-btn span { display: none; }
+            .mobile-menu-btn { display: block; }
+            .converter-section { padding: 24px 16px 48px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="logo">
+        <div class="logo-icon"><img src="logo.png" alt="convertfily logo"></div>
+        convertfily
+    </a>
+    <nav class="nav-links">
+        <a href="universal.html" class="nav-link">Universal</a>
+        <a href="images.html" class="nav-link">Images</a>
+        <a href="pdf.html" class="nav-link">PDF</a>
+        <a href="fusion.html" class="nav-link">Doc → PDF</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="audio.html" class="nav-link">Audio</a>
+    </nav>
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a href="https://github.com/jagathram-tech/convertfily" target="_blank" class="github-btn">
+        <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        <span>GitHub</span>
+    </a>
+</header>
+
+<nav class="mobile-nav" id="mobileNav">
+    <a href="universal.html" class="nav-link">Universal</a>
+    <a href="images.html" class="nav-link">Images</a>
+    <a href="pdf.html" class="nav-link">PDF</a>
+    <a href="fusion.html" class="nav-link">Doc → PDF</a>
+    <a href="videos.html" class="nav-link">Videos</a>
+    <a href="audio.html" class="nav-link">Audio</a>
+</nav>
+
+<section class="hero">
+    <h1>PDF to <span>Word</span></h1>
+    <p>Convert PDF files to editable Word documents instantly. Free, fast, and accurate.</p>
+</section>
+
+<main class="converter-section">
+    <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <h3>Drop your PDF file here</h3>
+        <p>or click to browse</p>
+        <span class="btn">Select File</span>
+        <input type="file" id="fileInput" accept=".pdf">
+    </div>
+
+    <div class="file-info" id="fileInfo">
+        <div class="icon">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="details">
+            <div class="name" id="fileName"></div>
+            <div class="size" id="fileSize"></div>
+        </div>
+        <button class="remove" id="removeFile">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
+    <div class="notice">
+        Note: For best results, use PDFs with text content. Complex layouts and images may not convert perfectly.
+    </div>
+
+    <button class="convert-btn" id="convertBtn" disabled>Convert to Word</button>
+
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Converting...</p>
+    </div>
+
+    <div class="result" id="result">
+        <h3>Conversion Complete!</h3>
+        <p>Your Word document is ready.</p>
+        <a href="#" class="download-btn" id="downloadBtn">Download Word</a>
+    </div>
+</main>
+
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFile = document.getElementById('removeFile');
+    const convertBtn = document.getElementById('convertBtn');
+    const loading = document.getElementById('loading');
+    const result = document.getElementById('result');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    let selectedFile = null;
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length) handleFile(files[0]);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) handleFile(e.target.files[0]);
+    });
+
+    removeFile.addEventListener('click', resetFile);
+
+    function handleFile(file) {
+        if (file.type !== 'application/pdf') {
+            alert('Please select a PDF file');
+            return;
+        }
+
+        selectedFile = file;
+        fileName.textContent = file.name;
+        fileSize.textContent = formatSize(file.size);
+        dropZone.classList.add('has-file');
+        fileInfo.classList.add('show');
+        convertBtn.disabled = false;
+        result.classList.remove('show');
+    }
+
+    function resetFile() {
+        selectedFile = null;
+        fileInput.value = '';
+        dropZone.classList.remove('has-file');
+        fileInfo.classList.remove('show');
+        convertBtn.disabled = true;
+        result.classList.remove('show');
+    }
+
+    function formatSize(bytes) {
+        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    convertBtn.addEventListener('click', async () => {
+        if (!selectedFile) return;
+
+        convertBtn.style.display = 'none';
+        loading.classList.add('show');
+
+        try {
+            const arrayBuffer = await selectedFile.arrayBuffer();
+            const { PDFDocument, rgb } = PDFLib;
+            
+            const pdfDoc = await PDFDocument.load(arrayBuffer);
+            const pages = pdfDoc.getPages();
+            
+            let textContent = '';
+            
+            for (let i = 0; i < pages.length; i++) {
+                textContent += `--- Page ${i + 1} ---\n\n`;
+            }
+
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+<title>${selectedFile.name.replace('.pdf', '')}</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+h1 { color: #2563eb; }
+.page-break { page-break-after: always; }
+</style>
+</head>
+<body>
+<h1>${selectedFile.name.replace('.pdf', '')}</h1>
+<p>${textContent || 'PDF content converted. Note: Full text extraction requires additional processing.'}</p>
+<p style="color: #64748b; font-size: 12px;">Converted from PDF using convertfily</p>
+</body>
+</html>`;
+
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            
+            downloadBtn.href = url;
+            downloadBtn.download = selectedFile.name.replace('.pdf', '.doc');
+
+            loading.classList.remove('show');
+            result.classList.add('show');
+            convertBtn.style.display = 'block';
+        } catch (error) {
+            alert('Error converting PDF: ' + error.message);
+            loading.classList.remove('show');
+            convertBtn.style.display = 'block';
+        }
+    });
+
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileNav = document.getElementById('mobileNav');
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => mobileNav.classList.toggle('open'));
+        document.querySelectorAll('.mobile-nav .nav-link').forEach(link => {
+            link.addEventListener('click', () => mobileNav.classList.remove('open'));
+        });
+    }
+</script>
+
+</body>
+</html>

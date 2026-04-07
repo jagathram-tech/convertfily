@@ -1,6 +1,6 @@
 {
-  "name": "Covertfily",
-  "short_name": "Covertfily",
+  "name": "covertfily",
+  "short_name": "covertfily",
   "description": "Fastest and 100% private file converter.",
   "start_url": "/",
   "display": "standalone",

@@ -1244,6 +1244,13 @@
         const content = await currentFile.text();
 
         if (selectedOutput === 'application/pdf') {
+            if (!window.jspdf) {
+                for (let i = 0; i < 50; i++) {
+                    if (window.jspdf) break;
+                    await new Promise(r => setTimeout(r, 100));
+                }
+            }
+            if (!window.jspdf) throw new Error('PDF engine failed to load');
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFontSize(fontSize);

@@ -992,6 +992,7 @@
             const video = document.createElement('video');
             video.src = URL.createObjectURL(file);
             video.muted = true;
+            video.crossOrigin = 'anonymous';
             await new Promise(resolve => video.onloadedmetadata = resolve);
 
             const canvas = document.createElement('canvas');
@@ -1022,15 +1023,21 @@
 
             mediaRecorder.start();
 
+            let wmImg = null;
+            if (!isTextWatermark && watermarkImageData) {
+                wmImg = new Image();
+                wmImg.src = watermarkImageData;
+                await new Promise(res => wmImg.onload = res);
+            }
+
             video.currentTime = 0;
             
-            const drawFrame = async () => {
+            const drawFrame = () => {
                 if (video.ended || video.paused) return;
                 
                 ctx.drawImage(video, 0, 0);
                 
                 if (isTextWatermark) {
-                    const hex = textColor.replace('#', '');
                     ctx.globalAlpha = opacity;
                     ctx.font = `bold ${fontSize}px Arial`;
                     ctx.fillStyle = textColor;
@@ -1070,11 +1077,7 @@
                         ctx.fillText(text, x, y);
                     }
                     ctx.globalAlpha = 1;
-                } else if (watermarkImageData) {
-                    const wmImg = new Image();
-                    wmImg.src = watermarkImageData;
-                    await new Promise(res => wmImg.onload = res);
-                    
+                } else if (wmImg && wmImg.complete) {
                     const wmSize = parseInt(document.getElementById('imageSize').value) / 100;
                     const wmWidth = canvas.width * wmSize;
                     const wmHeight = (wmImg.height / wmImg.width) * wmWidth;
@@ -1090,16 +1093,16 @@
                             }
                         }
                     } else if (document.getElementById('imagePosition').value === 'top-left') {
-                        x = 20; y = canvas.height - wmHeight - 20;
-                        ctx.drawImage(wmImg, x, y, wmWidth, wmHeight);
-                    } else if (document.getElementById('imagePosition').value === 'top-right') {
-                        x = canvas.width - wmWidth - 20; y = canvas.height - wmHeight - 20;
-                        ctx.drawImage(wmImg, x, y, wmWidth, wmHeight);
-                    } else if (document.getElementById('imagePosition').value === 'bottom-left') {
                         x = 20; y = 20;
                         ctx.drawImage(wmImg, x, y, wmWidth, wmHeight);
-                    } else if (document.getElementById('imagePosition').value === 'bottom-right') {
+                    } else if (document.getElementById('imagePosition').value === 'top-right') {
                         x = canvas.width - wmWidth - 20; y = 20;
+                        ctx.drawImage(wmImg, x, y, wmWidth, wmHeight);
+                    } else if (document.getElementById('imagePosition').value === 'bottom-left') {
+                        x = 20; y = canvas.height - wmHeight - 20;
+                        ctx.drawImage(wmImg, x, y, wmWidth, wmHeight);
+                    } else if (document.getElementById('imagePosition').value === 'bottom-right') {
+                        x = canvas.width - wmWidth - 20; y = canvas.height - wmHeight - 20;
                         ctx.drawImage(wmImg, x, y, wmWidth, wmHeight);
                     } else {
                         ctx.drawImage(wmImg, x, y, wmWidth, wmHeight);

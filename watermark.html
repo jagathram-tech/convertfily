@@ -5,8 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watermark Tool - covertfily</title>
     <meta name="description" content="Add text or image watermarks to PDF, images, and videos. Batch watermarking supported. Free online tool.">
+    <meta name="keywords" content="covertfily, free Watermark Tool, private converter, browser converter, no upload, local file converter">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="author" content="covertfily">
+    <meta name="theme-color" content="#6366f1">
     <link rel="canonical" href="https://covertfily.com/watermark.html">
+    <meta name="google-site-verification" content="6mltV1QYTyi4kLvXx6l395BbEG8FGmRnqe02e-Q2z70" />
     <link rel="icon" type="image/png" href="favicon.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="favicon.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://covertfily.com/watermark.html">
+    <meta property="og:title" content="Watermark Tool - covertfily">
+    <meta property="og:description" content="Add text or image watermarks to PDF, images, and videos. Batch watermarking supported. Free online tool.">
+    <meta property="og:image" content="https://covertfily.com/og-image.png">
+    <meta property="og:site_name" content="covertfily">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://covertfily.com/watermark.html">
+    <meta name="twitter:title" content="Watermark Tool - covertfily">
+    <meta name="twitter:description" content="Add text or image watermarks to PDF, images, and videos. Batch watermarking supported. Free online tool.">
+    <meta name="twitter:image" content="https://covertfily.com/og-image.png">
+
+    <!-- Additional SEO -->
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="3 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+
+    <!-- JSON-LD Structured Data for WebApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Watermark Tool - covertfily",
+      "description": "Add text or image watermarks to PDF, images, and videos. Batch watermarking supported. Free online tool.",
+      "url": "https://covertfily.com/watermark.html",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <!-- JSON-LD Structured Data for Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://covertfily.com/"},
+        {"@type": "ListItem", "position": 2, "name": "Watermark Tool", "item": "https://covertfily.com/watermark.html"}
+      ]
+    }
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <style>
         :root {
@@ -29,9 +89,7 @@
             --radius-sm: 10px;
             --radius-xs: 6px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
@@ -39,30 +97,8 @@
             line-height: 1.6;
             min-height: 100vh;
         }
-
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(12px);
-            padding: 0 24px;
-            height: 68px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text);
-            text-decoration: none;
-        }
-
+        
+        
         .logo-icon {
             width: 36px;
             height: 36px;
@@ -73,29 +109,10 @@
             overflow: hidden;
             box-shadow: var(--shadow-md);
         }
-
         .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
-
-        .nav-links {
-            display: flex;
-            gap: 4px;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .nav-link {
-            padding: 8px 14px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: var(--radius-xs);
-            transition: all 0.15s ease;
-        }
-
+        
+        
         .nav-link:hover { color: var(--primary); background: var(--primary-light); }
-
         .github-btn {
             display: flex;
             align-items: center;
@@ -108,38 +125,31 @@
             font-size: 13px;
             font-weight: 600;
         }
-
         .github-btn:hover { background: var(--text-secondary); }
         .github-btn svg { width: 18px; height: 18px; fill: white; }
-
         .hero {
             background: linear-gradient(180deg, #fafbfc 0%, #f8fafc 100%);
             padding: 48px 24px 32px;
             text-align: center;
         }
-
         .hero h1 {
             font-size: clamp(28px, 4vw, 36px);
             font-weight: 800;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
-
         .hero h1 span { 
             background: linear-gradient(135deg, var(--primary), #7c3aed);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .hero p { font-size: 16px; color: var(--text-secondary); max-width: 520px; margin: 0 auto; }
-
         .converter-section {
             max-width: 720px;
             margin: 0 auto;
             padding: 32px 24px 64px;
         }
-
         .tab-nav {
             display: flex;
             gap: 8px;
@@ -147,7 +157,6 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-
         .tab-btn {
             padding: 10px 20px;
             background: var(--surface);
@@ -159,13 +168,10 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
         .tab-btn:hover { background: var(--primary-light); color: var(--primary); }
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
         .drop-zone {
             border: 2px dashed var(--border);
             border-radius: var(--radius);
@@ -175,10 +181,8 @@
             transition: all 0.2s ease;
             background: var(--surface);
         }
-
         .drop-zone:hover { border-color: var(--primary); background: var(--primary-light); }
         .drop-zone.has-file { border-color: var(--success); background: var(--success-bg); }
-
         .drop-zone-icon {
             width: 56px;
             height: 56px;
@@ -190,19 +194,16 @@
             justify-content: center;
             box-shadow: var(--shadow);
         }
-
         .drop-zone-icon svg { width: 28px; height: 28px; stroke: var(--primary); fill: none; stroke-width: 1.8; }
         .drop-zone h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
         .drop-zone p { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
         .drop-zone .btn { display: inline-block; background: var(--primary); color: white; padding: 10px 20px; border-radius: var(--radius-sm); font-weight: 600; }
         .drop-zone input { display: none; }
-
         .file-list {
             margin-top: 16px;
             max-height: 200px;
             overflow-y: auto;
         }
-
         .file-item {
             display: flex;
             align-items: center;
@@ -213,23 +214,18 @@
             margin-bottom: 6px;
             font-size: 13px;
         }
-
         .file-item .name { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .file-item .remove { background: none; border: none; color: var(--error); cursor: pointer; padding: 4px; }
-
         .options {
             margin-top: 20px;
         }
-
         .option-group { margin-bottom: 16px; }
-
         .option-group label {
             display: block;
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 8px;
         }
-
         .option-group input[type="text"],
         .option-group input[type="number"],
         .option-group select {
@@ -241,30 +237,25 @@
             background: var(--bg);
             color: var(--text);
         }
-
         .option-group input:focus, .option-group select:focus {
             outline: none;
             border-color: var(--primary);
         }
-
         .option-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
-
         .option-row-3 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
         }
-
         .watermark-type {
             display: flex;
             gap: 12px;
             margin-bottom: 16px;
         }
-
         .watermark-type label {
             display: flex;
             align-items: center;
@@ -277,13 +268,11 @@
             font-size: 14px;
             font-weight: 500;
         }
-
         .watermark-type input:checked + span {
             background: var(--primary-light);
             border-color: var(--primary);
             color: var(--primary);
         }
-
         .image-watermark-preview {
             display: none;
             margin-top: 12px;
@@ -292,23 +281,19 @@
             border-radius: var(--radius-sm);
             text-align: center;
         }
-
         .image-watermark-preview.show { display: block; }
-
         .image-watermark-preview img {
             max-width: 150px;
             max-height: 100px;
             border-radius: var(--radius-xs);
             margin-bottom: 8px;
         }
-
         .image-watermark-preview .change-btn {
             font-size: 12px;
             color: var(--primary);
             cursor: pointer;
             text-decoration: underline;
         }
-
         .convert-btn {
             width: 100%;
             padding: 14px 24px;
@@ -321,18 +306,14 @@
             cursor: pointer;
             margin-top: 16px;
         }
-
         .convert-btn:hover { background: var(--primary-dark); }
         .convert-btn:disabled { background: var(--text-muted); cursor: not-allowed; }
-
         .loading {
             display: none;
             text-align: center;
             padding: 32px;
         }
-
         .loading.show { display: block; }
-
         .spinner {
             width: 40px;
             height: 40px;
@@ -342,9 +323,7 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 16px;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
-
         .result {
             display: none;
             margin-top: 24px;
@@ -353,12 +332,10 @@
             border-radius: var(--radius);
             text-align: center;
         }
-
         .result.show { display: block; }
         .result h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--success); }
         .result p { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
         .result .stats { font-size: 13px; margin-bottom: 12px; }
-
         .download-btn {
             display: inline-block;
             background: var(--success);
@@ -369,95 +346,138 @@
             font-weight: 700;
             text-decoration: none;
         }
-
         .download-btn:hover { background: #047857; }
-
-        .mobile-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+        
         .mobile-menu-btn svg { width: 22px; height: 22px; stroke: var(--text); }
-
-        .mobile-nav {
-            display: none;
-            position: fixed;
-            top: 68px;
-            left: 12px;
-            right: 12px;
-            background: white;
-            border-radius: var(--radius-sm);
-            padding: 12px;
-            box-shadow: var(--shadow-md);
-            z-index: 99;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
+        
         .mobile-nav.open { display: flex; }
-        .mobile-nav .nav-link {
-            padding: 12px 16px;
-            background: var(--surface);
-            border-radius: var(--radius-xs);
-            font-size: 14px;
-            color: var(--text);
-            text-decoration: none;
-            flex: 1;
-            text-align: center;
-            min-width: calc(50% - 4px);
-        }
-
+        .mobile-nav 
         @media (max-width: 768px) {
-            .nav-links { display: none; }
+            
             .github-btn span { display: none; }
-            .mobile-menu-btn { display: block; }
+            
             .converter-section { padding: 24px 16px 48px; }
             .option-row, .option-row-3 { grid-template-columns: 1fr; }
             .tab-btn { padding: 8px 14px; font-size: 13px; }
         }
     </style>
-    </head>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'sans-serif'] },
+            colors: { brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 900: '#312e81' } }
+          }
+        }
+      }
+    </script>
+</head>
 <body>
-
-<header>
-    <a href="index.html" class="logo">
-        <div class="logo-icon"><img src="logo.png" alt="covertfily logo"></div>
+  
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 text-xl font-black tracking-tight text-slate-900 group">
+        <div class="w-9 h-9 rounded-xl overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-200">
+          <img src="logo.png" alt="covertfily" class="w-full h-full object-cover">
+        </div>
         covertfily
-    </a>
-    <nav class="nav-links">
-        <a href="universal.html" class="nav-link">Universal</a>
-        <a href="images.html" class="nav-link">Images</a>
-        <a href="pdf.html" class="nav-link">PDF</a>
-        <a href="fusion.html" class="nav-link">Doc → PDF</a>
-        <a href="videos.html" class="nav-link">Videos</a>
-        <a href="audio.html" class="nav-link">Audio</a>
-    </nav>
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <a href="https://github.com/jagathram-tech/covertfily" target="_blank" class="github-btn">
-        <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-        <span>GitHub</span>
-    </a>
-</header>
+      </a>
+      
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-2">
+        <a href="index.html" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:text-brand-600 hover:bg-brand-50 transition-all">Home</a>
+        
+        <!-- Tools Dropdown -->
+        <div class="relative group">
+          <button class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 group-hover:text-brand-600 group-hover:bg-brand-50 transition-all">
+            Tools
+            <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          
+          <div class="absolute left-0 top-full mt-1 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 p-3 grid grid-cols-1 gap-1">
+            <a href="pdf.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-50 transition-colors group/item">
+              <div class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center text-lg">📄</div>
+              <div><p class="text-sm font-bold text-slate-900 leading-none mb-1">PDF Tools</p><p class="text-[10px] text-slate-500">Edit, Merge, Compress</p></div>
+            </a>
+            <a href="images.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-50 transition-colors group/item">
+              <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-lg">🖼️</div>
+              <div><p class="text-sm font-bold text-slate-900 leading-none mb-1">Image Tools</p><p class="text-[10px] text-slate-500">Convert, Resize, Optimize</p></div>
+            </a>
+            <a href="videos.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-50 transition-colors group/item">
+              <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-lg">🎥</div>
+              <div><p class="text-sm font-bold text-slate-900 leading-none mb-1">Video & Audio</p><p class="text-[10px] text-slate-500">Convert MKV, MP4, MP3</p></div>
+            </a>
+            <a href="universal.html" class="flex items-center gap-3 p-3 rounded-xl hover:bg-brand-50 transition-colors group/item border-t border-slate-50 mt-1">
+              <div class="w-8 h-8 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center text-lg">⚙️</div>
+              <div><p class="text-sm font-bold text-brand-600 leading-none mb-1">All Converters</p><p class="text-[10px] text-slate-500">50+ Universal Tools</p></div>
+            </a>
+          </div>
+        </div>
+      </nav>
 
-<nav class="mobile-nav" id="mobileNav">
-    <a href="universal.html" class="nav-link">Universal</a>
-    <a href="images.html" class="nav-link">Images</a>
-    <a href="pdf.html" class="nav-link">PDF</a>
-    <a href="fusion.html" class="nav-link">Doc → PDF</a>
-    <a href="videos.html" class="nav-link">Videos</a>
-    <a href="audio.html" class="nav-link">Audio</a>
-</nav>
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/jagathram-tech/covertfily" target="_blank" class="hidden sm:flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm hover:translate-y-[-1px]">
+          GitHub
+        </a>
+        <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-600 hover:text-slate-900">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobileNav" class="hidden border-t border-gray-100 bg-white/95 backdrop-blur-md px-6 py-8 space-y-6 md:hidden max-h-[85vh] overflow-y-auto">
+      <a href="index.html" class="block text-2xl font-black text-slate-900">Home</a>
+      
+      <div class="space-y-4 pt-4 border-t border-slate-100">
+        <p class="text-xs font-black uppercase tracking-widest text-slate-400">Our Tools</p>
+        <div class="grid grid-cols-1 gap-3">
+          <a href="pdf.html" class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+            <span class="text-2xl">📄</span>
+            <span class="font-bold text-slate-700">PDF Tools</span>
+          </a>
+          <a href="images.html" class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+            <span class="text-2xl">🖼️</span>
+            <span class="font-bold text-slate-700">Image Tools</span>
+          </a>
+          <a href="videos.html" class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl">
+            <span class="text-2xl">🎥</span>
+            <span class="font-bold text-slate-700">Video & Audio</span>
+          </a>
+          <a href="universal.html" class="flex items-center gap-4 bg-brand-600 p-4 rounded-2xl text-white">
+            <span class="text-2xl text-white">⚙️</span>
+            <span class="font-bold">All Feature List</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="pt-8 border-t border-slate-100">
+        <a href="https://github.com/jagathram-tech/covertfily" class="flex items-center justify-center gap-2 bg-slate-900 text-white p-4 rounded-2xl font-bold">
+           View on GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+
+
+  <!-- Header -->
+  
+
 
 <section class="hero">
     <h1><span>Watermark</span> Tool</h1>
     <p>Add text or image watermarks to PDF, images, and videos. Batch watermarking supported.</p>
 </section>
-
 <main class="converter-section">
     <div class="tab-nav">
         <button class="tab-btn active" data-tab="pdf">PDF Watermark</button>
         <button class="tab-btn" data-tab="image">Image Watermark</button>
         <button class="tab-btn" data-tab="video">Video Watermark</button>
     </div>
-
     <div id="tab-pdf" class="tab-content active">
         <div class="drop-zone" id="dropZonePdf">
             <div class="drop-zone-icon">
@@ -470,7 +490,6 @@
         </div>
         <div class="file-list" id="fileListPdf"></div>
     </div>
-
     <div id="tab-image" class="tab-content">
         <div class="drop-zone" id="dropZoneImage">
             <div class="drop-zone-icon">
@@ -483,7 +502,6 @@
         </div>
         <div class="file-list" id="fileListImage"></div>
     </div>
-
     <div id="tab-video" class="tab-content">
         <div class="drop-zone" id="dropZoneVideo">
             <div class="drop-zone-icon">
@@ -496,7 +514,6 @@
         </div>
         <div class="file-list" id="fileListVideo"></div>
     </div>
-
     <div class="options">
         <div class="watermark-type">
             <label>
@@ -508,13 +525,11 @@
                 <span>Image Watermark</span>
             </label>
         </div>
-
         <div id="textOptions">
             <div class="option-group">
                 <label>Watermark Text</label>
                 <input type="text" id="watermarkText" placeholder="e.g., CONFIDENTIAL" value="WATERMARK">
             </div>
-
             <div class="option-row">
                 <div class="option-group">
                     <label>Font Size</label>
@@ -532,7 +547,6 @@
                     </select>
                 </div>
             </div>
-
             <div class="option-row">
                 <div class="option-group">
                     <label>Text Color</label>
@@ -553,7 +567,6 @@
                 </div>
             </div>
         </div>
-
         <div id="imageOptions" style="display:none;">
             <div class="option-group">
                 <label>Upload Watermark Image</label>
@@ -567,7 +580,6 @@
                     <span class="change-btn" onclick="document.getElementById('watermarkImageInput').click()">Change Image</span>
                 </div>
             </div>
-
             <div class="option-row">
                 <div class="option-group">
                     <label>Image Size (%)</label>
@@ -584,7 +596,6 @@
                     </select>
                 </div>
             </div>
-
             <div class="option-group">
                 <label>Position</label>
                 <select id="imagePosition">
@@ -598,22 +609,32 @@
             </div>
         </div>
     </div>
-
     <button class="convert-btn" id="convertBtn" disabled>Add Watermark</button>
-
     <div class="loading" id="loading">
         <div class="spinner"></div>
         <p id="loadingText">Processing...</p>
     </div>
-
     <div class="result" id="result">
         <h3>Watermark Added!</h3>
         <p class="stats" id="resultStats"></p>
         <p>Your watermarked files are ready.</p>
         <a href="#" class="download-btn" id="downloadBtn">Download Files</a>
     </div>
-</main>
 
+<!-- Native Banner Ad -->
+<div style="display: flex; justify-content: center; margin: 20px 0;">
+    <script type="text/javascript">
+	atOptions = {
+		'key' : '5b7ed516631627d7e632800d39e2617a',
+		'format' : 'iframe',
+		'height' : 90,
+		'width' : 728,
+		'params' : {}
+	};
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/5b7ed516631627d7e632800d39e2617a/invoke.js"></script>
+</div>
+</main>
 <script>
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -626,11 +647,9 @@
     const result = document.getElementById('result');
     const downloadBtn = document.getElementById('downloadBtn');
     const resultStats = document.getElementById('resultStats');
-
     let currentTab = 'pdf';
     let files = { pdf: [], image: [], video: [] };
     let watermarkImageData = null;
-
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
@@ -641,7 +660,6 @@
             updateConvertBtn();
         });
     });
-
     watermarkTypeRadios.forEach(radio => {
         radio.addEventListener('change', () => {
             if (radio.value === 'text') {
@@ -653,57 +671,46 @@
             }
         });
     });
-
     function setupDropZone(id, inputId, fileListId, type) {
         const dropZone = document.getElementById(id);
         const input = document.getElementById(inputId);
         const fileList = document.getElementById(fileListId);
-
         dropZone.addEventListener('click', () => input.click());
-        
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.classList.add('dragover');
         });
-
         dropZone.addEventListener('dragleave', () => {
             dropZone.classList.remove('dragover');
         });
-
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('dragover');
             handleFiles(Array.from(e.dataTransfer.files), type);
         });
-
         input.addEventListener('change', (e) => {
             handleFiles(Array.from(e.target.files), type);
         });
-
         function handleFiles(fileArray) {
             const acceptTypes = {
                 pdf: ['application/pdf'],
                 image: ['image/jpeg', 'image/png', 'image/webp'],
                 video: ['video/mp4', 'video/webm']
             };
-
             const validFiles = fileArray.filter(f => {
                 if (type === 'pdf') return f.type === 'application/pdf';
                 if (type === 'image') return f.type.startsWith('image/');
                 if (type === 'video') return f.type.startsWith('video/');
                 return false;
             });
-
             files[type] = [...files[type], ...validFiles];
             renderFileList(fileListId, type);
             updateConvertBtn();
         }
     }
-
     function renderFileList(listId, type) {
         const fileList = document.getElementById(listId);
         fileList.innerHTML = '';
-        
         files[type].forEach((file, index) => {
             const item = document.createElement('div');
             item.className = 'file-item';
@@ -716,40 +723,32 @@
             `;
             fileList.appendChild(item);
         });
-
         if (files[type].length > 0) {
             document.getElementById('dropZone' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('has-file');
         } else {
             document.getElementById('dropZone' + type.charAt(0).toUpperCase() + type.slice(1)).classList.remove('has-file');
         }
     }
-
     function removeFile(index, type) {
         files[type].splice(index, 1);
         renderFileList('fileList' + type.charAt(0).toUpperCase() + type.slice(1), type);
         updateConvertBtn();
     }
-
     function updateConvertBtn() {
         convertBtn.disabled = files[currentTab].length === 0;
     }
-
     function formatSize(bytes) {
         if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
         return (bytes / 1048576).toFixed(1) + ' MB';
     }
-
     setupDropZone('dropZonePdf', 'fileInputPdf', 'fileListPdf', 'pdf');
     setupDropZone('dropZoneImage', 'fileInputImage', 'fileListImage', 'image');
     setupDropZone('dropZoneVideo', 'fileInputVideo', 'fileListVideo', 'video');
-
     const watermarkImageInput = document.getElementById('watermarkImageInput');
     const watermarkImageZone = document.getElementById('watermarkImageZone');
     const watermarkPreview = document.getElementById('watermarkPreview');
     const watermarkPreviewImg = document.getElementById('watermarkPreviewImg');
-
     watermarkImageZone.addEventListener('click', () => watermarkImageInput.click());
-    
     watermarkImageInput.addEventListener('change', (e) => {
         if (e.target.files[0]) {
             const reader = new FileReader();
@@ -761,12 +760,10 @@
             reader.readAsDataURL(e.target.files[0]);
         }
     });
-
     convertBtn.addEventListener('click', async () => {
         convertBtn.style.display = 'none';
         loading.classList.add('show');
         loadingText.textContent = `Processing ${files[currentTab].length} file(s)...`;
-
         try {
             if (currentTab === 'pdf') {
                 await processPdfWatermark();
@@ -778,11 +775,9 @@
         } catch (error) {
             alert('Error: ' + error.message);
         }
-
         loading.classList.remove('show');
         convertBtn.style.display = 'block';
     });
-
     async function processPdfWatermark() {
         const { PDFDocument, rgb, degrees, StandardFonts } = PDFLib;
         const text = document.getElementById('watermarkText').value;
@@ -791,21 +786,16 @@
         const position = document.getElementById('position').value;
         const textColor = document.getElementById('textColor').value;
         const isTextWatermark = document.querySelector('input[name="watermarkType"][value="text"]').checked;
-
         const results = [];
-
         for (const file of files.pdf) {
             const arrayBuffer = await file.arrayBuffer();
             const pdfDoc = await PDFDocument.load(arrayBuffer);
             const pages = pdfDoc.getPages();
             const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
             for (const page of pages) {
                 const { width, height } = page.getSize();
-                
                 if (isTextWatermark) {
                     let x, y, rotate;
-                    
                     switch(position) {
                         case 'center': x = width/2; y = height/2; rotate = degrees(0); break;
                         case 'diagonal': x = width/2; y = height/2; rotate = degrees(45); break;
@@ -816,12 +806,10 @@
                         case 'top': x = width/2; y = height - 50; rotate = degrees(0); break;
                         case 'bottom': x = width/2; y = 50; rotate = degrees(0); break;
                     }
-
                     const hex = textColor.replace('#', '');
                     const r = parseInt(hex.substr(0,2), 16) / 255;
                     const g = parseInt(hex.substr(2,2), 16) / 255;
                     const b = parseInt(hex.substr(4,2), 16) / 255;
-
                     page.drawText(text, {
                         x: x - (text.length * fontSize / 4),
                         y: y - fontSize / 2,
@@ -837,7 +825,6 @@
                     const imgWidth = width * imgSize;
                     const imgHeight = (img.height / img.width) * imgWidth;
                     const imgOpacity = parseFloat(document.getElementById('imageOpacity').value);
-
                     let x, y;
                     switch(document.getElementById('imagePosition').value) {
                         case 'center': x = (width - imgWidth) / 2; y = (height - imgHeight) / 2; break;
@@ -846,7 +833,6 @@
                         case 'bottom-left': x = 20; y = 20; break;
                         case 'bottom-right': x = width - imgWidth - 20; y = 20; break;
                     }
-
                     page.drawImage(img, {
                         x: x,
                         y: y,
@@ -856,17 +842,14 @@
                     });
                 }
             }
-
             const pdfBytes = await pdfDoc.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
             results.push({ name: file.name.replace('.pdf', '-watermarked.pdf'), blob });
         }
-
         downloadFiles(results);
         resultStats.textContent = `${files.pdf.length} PDF file(s) watermarked`;
         result.classList.add('show');
     }
-
     async function processImageWatermark() {
         const text = document.getElementById('watermarkText').value;
         const fontSize = parseInt(document.getElementById('fontSize').value);
@@ -874,22 +857,18 @@
         const position = document.getElementById('position').value;
         const textColor = document.getElementById('textColor').value;
         const isTextWatermark = document.querySelector('input[name="watermarkType"][value="text"]').checked;
-
         const results = [];
-
         for (const file of files.image) {
             const img = new Image();
             await new Promise((resolve) => {
                 img.onload = resolve;
                 img.src = URL.createObjectURL(file);
             });
-
             const canvas = document.createElement('canvas');
             canvas.width = img.width;
             canvas.height = img.height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0);
-
             if (isTextWatermark) {
                 const hex = textColor.replace('#', '');
                 ctx.globalAlpha = opacity;
@@ -897,10 +876,8 @@
                 ctx.fillStyle = textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-
                 let x = canvas.width / 2;
                 let y = canvas.height / 2;
-
                 if (position === 'diagonal') {
                     ctx.save();
                     ctx.translate(x, y);
@@ -936,15 +913,12 @@
                     wmImg.onload = resolve;
                     wmImg.src = watermarkImageData;
                 });
-
                 const wmSize = parseInt(document.getElementById('imageSize').value) / 100;
                 const wmWidth = canvas.width * wmSize;
                 const wmHeight = (wmImg.height / wmImg.width) * wmWidth;
                 ctx.globalAlpha = parseFloat(document.getElementById('imageOpacity').value);
-
                 let x = (canvas.width - wmWidth) / 2;
                 let y = (canvas.height - wmHeight) / 2;
-
                 if (document.getElementById('imagePosition').value === 'tiled') {
                     for (let tx = 0; tx < canvas.width; tx += wmWidth + 50) {
                         for (let ty = 0; ty < canvas.height; ty += wmHeight + 50) {
@@ -964,19 +938,15 @@
                     ctx.drawImage(wmImg, x, y, wmWidth, wmHeight);
                 }
             }
-
             const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
             const blob = await new Promise(resolve => canvas.toBlob(resolve, outputType, 0.92));
-            
             const ext = outputType === 'image/png' ? '-watermarked.png' : '-watermarked.jpg';
             results.push({ name: file.name.replace(/\.[^.]+$/, ext), blob });
         }
-
         downloadFiles(results);
         resultStats.textContent = `${files.image.length} image(s) watermarked`;
         result.classList.add('show');
     }
-
     async function processVideoWatermark() {
         const text = document.getElementById('watermarkText').value;
         const fontSize = parseInt(document.getElementById('fontSize').value);
@@ -984,25 +954,19 @@
         const position = document.getElementById('position').value;
         const textColor = document.getElementById('textColor').value;
         const isTextWatermark = document.querySelector('input[name="watermarkType"][value="text"]').checked;
-
         const results = [];
-
         for (const file of files.video) {
             loadingText.textContent = `Processing ${file.name}...`;
-            
             const video = document.createElement('video');
             video.src = URL.createObjectURL(file);
             video.muted = true;
             video.crossOrigin = 'anonymous';
             await new Promise(resolve => video.onloadedmetadata = resolve);
-
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
-
             const stream = canvas.captureStream(30);
-            
             let mimeType = 'video/webm;codecs=vp9';
             if (!MediaRecorder.isTypeSupported(mimeType)) {
                 mimeType = 'video/webm;codecs=vp8';
@@ -1010,44 +974,33 @@
             if (!MediaRecorder.isTypeSupported(mimeType)) {
                 mimeType = 'video/webm';
             }
-            
             const mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
             const chunks = [];
-            
             mediaRecorder.ondataavailable = (e) => {
                 if (e.data.size > 0) chunks.push(e.data);
             };
-
             const recordingPromise = new Promise(resolve => {
                 mediaRecorder.onstop = resolve;
             });
-
             mediaRecorder.start();
-
             let wmImg = null;
             if (!isTextWatermark && watermarkImageData) {
                 wmImg = new Image();
                 wmImg.src = watermarkImageData;
                 await new Promise(res => wmImg.onload = res);
             }
-
             video.currentTime = 0;
-            
             const drawFrame = () => {
                 if (video.ended || video.paused) return;
-                
                 ctx.drawImage(video, 0, 0);
-                
                 if (isTextWatermark) {
                     ctx.globalAlpha = opacity;
                     ctx.font = `bold ${fontSize}px Arial`;
                     ctx.fillStyle = textColor;
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-
                     let x = canvas.width / 2;
                     let y = canvas.height / 2;
-
                     if (position === 'diagonal') {
                         ctx.save();
                         ctx.translate(x, y);
@@ -1083,10 +1036,8 @@
                     const wmWidth = canvas.width * wmSize;
                     const wmHeight = (wmImg.height / wmImg.width) * wmWidth;
                     ctx.globalAlpha = parseFloat(document.getElementById('imageOpacity').value);
-                    
                     let x = (canvas.width - wmWidth) / 2;
                     let y = (canvas.height - wmHeight) / 2;
-                    
                     if (document.getElementById('imagePosition').value === 'tiled') {
                         for (let tx = 0; tx < canvas.width; tx += wmWidth + 50) {
                             for (let ty = 0; ty < canvas.height; ty += wmHeight + 50) {
@@ -1110,41 +1061,31 @@
                     }
                     ctx.globalAlpha = 1;
                 }
-                
                 requestAnimationFrame(drawFrame);
             };
-            
             video.play();
             drawFrame();
-            
             video.onended = () => {
                 mediaRecorder.stop();
             };
-            
             video.onerror = () => {
                 mediaRecorder.stop();
             };
-            
             setTimeout(() => {
                 if (mediaRecorder.state === 'recording') {
                     video.pause();
                     mediaRecorder.stop();
                 }
             }, 60000);
-            
             await recordingPromise;
-            
             const blob = new Blob(chunks, { type: mimeType });
             results.push({ name: file.name.replace(/\.[^.]+$/, '-watermarked.webm'), blob });
-            
             URL.revokeObjectURL(video.src);
         }
-
         downloadFiles(results);
         resultStats.textContent = `${files.video.length} video(s) watermarked`;
         result.classList.add('show');
     }
-
     function downloadFiles(results) {
         if (results.length === 1) {
             downloadBtn.href = URL.createObjectURL(results[0].blob);
@@ -1157,7 +1098,6 @@
             results.forEach(r => URL.revokeObjectURL(URL.createObjectURL(r.blob)));
         }
     }
-
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const mobileNav = document.getElementById('mobileNav');
     if (mobileMenuBtn) {
@@ -1167,7 +1107,6 @@
         });
     }
 </script>
-
 <script>
 (function(){
   // Mirror right ad to left after it loads
@@ -1181,7 +1120,6 @@
   }, 800);
 })();
 </script>
-
   <div id="container-4dc3593bb92cbf7f6ad80e7d0905abe4"></div>
 </div>
 <div id="ad-side-l">
@@ -1197,37 +1135,42 @@
 })();
 </script>
 
-<!-- Adsterra Side Banners -->
-<style>
-  #ad-side-r,#ad-side-l{position:fixed;top:50%;transform:translateY(-50%);width:160px;z-index:99999;overflow:visible;}
-  #ad-side-r{right:0;}
-  #ad-side-l{left:0;}
-  #ad-side-r *,#ad-side-l *{all:revert;}
-  @media(max-width:1300px){.ad-side-r,.ad-side-l{display:none;}}
-</style>
-<script>
-  atOptions = {
-    'key' : '3c6b7149f636d00e1bd554925cf7c901',
-    'format' : 'iframe',
-    'height' : 600,
-    'width' : 160,
-    'params' : {}
-  };
-</script>
-<div id="ad-side-r">
-<script src="https://www.highperformanceformat.com/3c6b7149f636d00e1bd554925cf7c901/invoke.js"></script>
+  <!-- Adsterra Side Banners -->
+  <style>
+    #ad-side-r {position:fixed;top:50%;transform:translateY(-50%);right:0;width:160px;z-index:99999;}
+    #ad-side-l {position:fixed;top:50%;transform:translateY(-50%);left:0;width:160px;z-index:99999;}
+    @media(max-width:1300px){#ad-side-r, #ad-side-l{display:none;}}
+  </style>
+  <div id="ad-side-r">
+    <script type="text/javascript">
+      atOptions = { 'key' : '3c6b7149f636d00e1bd554925cf7c901', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/3c6b7149f636d00e1bd554925cf7c901/invoke.js"></script>
+  </div>
+  <div id="ad-side-l">
+    <script type="text/javascript">
+      atOptions = { 'key' : '3c6b7149f636d00e1bd554925cf7c901', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
+    </script>
+    <script type="text/javascript" src="//www.highperformanceformat.com/3c6b7149f636d00e1bd554925cf7c901/invoke.js"></script>
+  </div>
+
+<!-- Sticky Bottom Banner -->
+<div id="sticky-footer-ad" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 90px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-top: 1px solid #e2e8f0; z-index: 999999; display: flex; justify-content: center; align-items: center; transition: transform 0.3s ease-in-out;">
+  <button onclick="document.getElementById('sticky-footer-ad').style.transform='translateY(100%)'" style="position: absolute; top: -20px; right: 10px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 50%; width: 24px; height: 24px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+  <script type="text/javascript">
+	atOptions = { 'key' : '5b7ed516631627d7e632800d39e2617a', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+  </script>
+  <script type="text/javascript" src="//www.highperformanceformat.com/5b7ed516631627d7e632800d39e2617a/invoke.js"></script>
 </div>
-<div id="ad-side-l">
-<script>
-  atOptions = {
-    'key' : '3c6b7149f636d00e1bd554925cf7c901',
-    'format' : 'iframe',
-    'height' : 600,
-    'width' : 160,
-    'params' : {}
-  };
-</script>
-<script src="https://www.highperformanceformat.com/3c6b7149f636d00e1bd554925cf7c901/invoke.js"></script>
-</div>
+
+  <script>
+    (function() {
+      const btn = document.getElementById('mobileMenuBtn');
+      const nav = document.getElementById('mobileNav');
+      if (btn && nav) {
+        btn.onclick = function() { nav.classList.toggle('hidden'); };
+      }
+    })();
+  </script>
 </body>
 </html>

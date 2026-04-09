@@ -116,6 +116,18 @@
             justify-content: center;
             gap: 10px;
         }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .checkbox-group input {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -174,6 +186,10 @@
                             <input type="number" id="imgWidth" placeholder="Width">
                             <input type="number" id="imgHeight" placeholder="Height">
                         </div>
+                        <label class="checkbox-group">
+                            <input type="checkbox" id="lockAspect" checked>
+                            <span>Lock Aspect Ratio</span>
+                        </label>
                     </div>
                     <div class="control-group">
                         <button class="toggle-btn" id="roundBtn">
@@ -230,11 +246,27 @@
                         previewImg.src = originalImg.src;
                         imgWidth.value = originalImg.width;
                         imgHeight.value = originalImg.height;
+                        aspectRatio = originalImg.width / originalImg.height;
                         dropzone.style.display = 'none';
                         editor.style.display = 'grid';
                     };
                 };
                 reader.readAsDataURL(file);
+            }
+        };
+
+        let aspectRatio = 1;
+        const lockAspect = document.getElementById('lockAspect');
+
+        imgWidth.oninput = () => {
+            if (lockAspect.checked) {
+                imgHeight.value = Math.round(imgWidth.value / aspectRatio);
+            }
+        };
+
+        imgHeight.oninput = () => {
+            if (lockAspect.checked) {
+                imgWidth.value = Math.round(imgHeight.value * aspectRatio);
             }
         };
 

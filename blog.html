@@ -9,109 +9,43 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-4Z6LTJ67E2');
     </script>
-    <title>Covertfily Blog - File Conversion Insights</title>
+    <title>Covertfily Blog - Privacy & Tools</title>
     <link rel="icon" type="image/png" href="favicon.png">
+    <meta name="description" content="Insights into file formats, local-first privacy, and the mission of Covertfily.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        .blog-header {
-            text-align: center;
-            padding: 80px 20px;
-            background: var(--bg-alt);
-        }
+        .blog-header { background: #f8fafc; padding: 100px 20px; text-align: center; border-bottom: 1px solid var(--border); }
+        .blog-header h1 { font-size: 3rem; margin-bottom: 20px; }
+        .blog-grid { max-width: 1100px; margin: 60px auto; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
+        .blog-card { background: white; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; transition: all 0.3s; cursor: pointer; display: block; text-decoration: none; color: inherit; }
+        .blog-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        .blog-image { height: 200px; background: var(--bg-alt); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary); }
+        .blog-body { padding: 30px; }
+        .blog-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; background: #ebf2ff; color: var(--primary); font-size: 0.8rem; font-weight: 700; margin-bottom: 15px; }
+        .blog-body h3 { margin-bottom: 10px; font-size: 1.4rem; }
+        .blog-body p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
 
-        .blog-grid {
-            max-width: 1100px;
-            margin: -40px auto 80px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 30px;
-            padding: 0 20px;
-        }
-
-        .blog-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .blog-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-
-        .blog-image {
-            height: 200px;
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 3rem;
-        }
-
-        .blog-content {
-            padding: 25px;
-            flex-grow: 1;
-        }
-
-        .blog-tag {
-            background: var(--bg-alt);
-            color: var(--primary);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-            display: inline-block;
-        }
-
-        .blog-title {
-            font-size: 1.25rem;
-            font-weight: 800;
-            margin-bottom: 12px;
-            color: var(--text-main);
-            line-height: 1.4;
-        }
-
-        .blog-excerpt {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .blog-link {
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: auto;
-        }
-
-        .blog-link:hover {
-            gap: 12px;
-        }
+        /* Article Styling */
+        .article-view { display: none; max-width: 800px; margin: 60px auto; padding: 0 20px; }
+        .article-view.active { display: block; }
+        .article-content { font-size: 1.15rem; line-height: 1.8; color: #334155; }
+        .article-content h2 { margin: 40px 0 20px; color: var(--text-main); }
+        .article-content p { margin-bottom: 25px; }
+        .cta-box { background: var(--bg-alt); padding: 40px; border-radius: 20px; text-align: center; margin-top: 60px; border: 1px solid var(--border); }
+        .btn-cta { display: inline-block; padding: 15px 35px; background: var(--primary); color: white; text-decoration: none; border-radius: 10px; font-weight: 700; margin-top: 20px; transition: all 0.2s; }
+        .btn-back { display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); text-decoration: none; margin-bottom: 30px; font-weight: 600; }
+        .btn-back:hover { color: var(--primary); }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo">
+        <div class="logo" onclick="location.href='index.html'" style="cursor:pointer">
             <i class="fas fa-sync-alt"></i>
             <span>Covertfily</span>
         </div>
@@ -134,60 +68,192 @@
             <a href="https://github.com/jagathram-tech/covertfily" class="btn-primary"><i class="fab fa-github"></i> Open Source</a>
         </div>
     </nav>
+    
+    <!-- Side Skyscraper Ads -->
+    <div class="side-ad side-ad-left">
+        <!-- Paste EvaDav Left Script Here -->
 
-    <header class="blog-header">
-        <h1>Covertfily Blog</h1>
-        <p>Insights into file formats, privacy, and local-first technology.</p>
-    </header>
+        <div class="ad-fallback" id="fallback-left">
+            <i class="fab fa-github"></i>
+            <h4>Support Open Source</h4>
+            <p>If you find Covertfily useful, consider starring us on GitHub!</p>
+            <a href="https://github.com/jagathram-tech/covertfily" class="btn-fallback">Star Repository</a>
+        </div>
+    </div>
+    <div class="side-ad side-ad-right">
+        <!-- Paste EvaDav Right Script Here -->
 
-    <main class="blog-grid">
-        <article class="blog-card">
-            <div class="blog-image" style="background: linear-gradient(135deg, #2563eb, #7c3aed);">
-                <i class="fas fa-file-word"></i>
-            </div>
-            <div class="blog-content">
-                <span class="blog-tag">Formats</span>
-                <h2 class="blog-title">What is a DOCX File and How to Open It?</h2>
-                <p class="blog-excerpt">Explore the history and technical details of the DOCX format, and why client-side conversion is the safest way to handle your documents.</p>
-                <a href="blog-what-is-docx.html" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a>
-            </div>
-        </article>
+        <div class="ad-fallback" id="fallback-right">
+            <i class="fas fa-heart"></i>
+            <h4>No Ads? No Problem.</h4>
+            <p>Our tools are free and private for everyone, forever.</p>
+            <a href="blog.html#home" class="btn-fallback">Read Our Mission</a>
+        </div>
+    </div>
 
-        <article class="blog-card">
-            <div class="blog-image" style="background: linear-gradient(135deg, #10b981, #3b82f6);">
-                <i class="fas fa-shield-alt"></i>
-            </div>
-            <div class="blog-content">
-                <span class="blog-tag">Privacy</span>
-                <h2 class="blog-title">Why Local-First Conversion Matters</h2>
-                <p class="blog-excerpt">In an age of data breaches, learn why keeping your files on your hardware is the only way to ensure 100% privacy.</p>
-                <a href="blog-local-first-conversion.html" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a>
-            </div>
-        </article>
+    <!-- Blog Index View -->
+    <div id="blogIndex">
+        <header class="blog-header">
+            <h1>Covertfily Blog</h1>
+            <p>Insights into file formats, privacy, and local-first technology.</p>
+        </header>
+        <main class="blog-grid">
+            <a href="#what-is-docx" class="blog-card">
+                <div class="blog-image" style="background: linear-gradient(135deg, #2563eb, #7c3aed); color: white;"><i class="fas fa-file-word"></i></div>
+                <div class="blog-body">
+                    <span class="blog-tag">Formats</span>
+                    <h3>What is a DOCX File?</h3>
+                    <p>Learn everything about the DOCX file format, how it differs from DOC, and why it's the modern standard.</p>
+                </div>
+            </a>
+            <a href="#local-first-conversion" class="blog-card">
+                <div class="blog-image" style="background: linear-gradient(135deg, #10b981, #3b82f6); color: white;"><i class="fas fa-shield-alt"></i></div>
+                <div class="blog-body">
+                    <span class="blog-tag">Privacy</span>
+                    <h3>The Privacy of Local-First</h3>
+                    <p>Discover why client-side conversion is significantly safer than cloud-based alternatives.</p>
+                </div>
+            </a>
+            <a href="#introducing-covertfily" class="blog-card">
+                <div class="blog-image" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: white;"><i class="fas fa-rocket"></i></div>
+                <div class="blog-body">
+                    <span class="blog-tag">Open Source</span>
+                    <h3>Introducing Covertfily</h3>
+                    <p>Meet the MIT-Licensed conversion suite built for privacy, speed, and transparency.</p>
+                </div>
+            </a>
+        </main>
+    </div>
 
-        <article class="blog-card">
-            <div class="blog-image" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
-                <i class="fas fa-code"></i>
-            </div>
-            <div class="blog-content">
-                <span class="blog-tag">Open Source</span>
-                <h2 class="blog-title">Introducing Covertfily: MIT Licensed Power</h2>
-                <p class="blog-excerpt">We are transparent, open, and free forever. Discover the technology stack behind our 100% browser-based engine.</p>
-                <a href="blog-introducing-covertfily.html" class="blog-link">Read More <i class="fas fa-arrow-right"></i></a>
-            </div>
-        </article>
+    <!-- Article Views -->
+    <main class="article-view" id="articleView">
+        <a href="#home" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Blog</a>
+        <div id="articleContent"></div>
     </main>
 
+    <!-- Templates (Hidden) -->
+    <template id="tpl-what-is-docx">
+        <header class="article-header">
+            <span class="blog-tag">Formats</span>
+            <h1 style="font-size: 2.5rem; line-height: 1.2; margin: 20px 0;">What is a DOCX File and Why is it the Standard?</h1>
+            <p style="color: var(--text-muted); font-weight: 500;">By Covertfily Team • April 9, 2026</p>
+        </header>
+        <section class="article-content">
+            <p>If you've ever used Microsoft Word or received a document in an email, you've likely encountered the <strong>.docx</strong> extension. But what exactly is it, and how does it differ from the older .doc format?</p>
+            <h2>The Evolution of Documents: From .DOC to .DOCX</h2>
+            <p>Before 2007, Microsoft Word used the .doc format, which was a binary format. In 2007, Microsoft introduced <strong>Office Open XML</strong>, which gave birth to the .docx format. The 'X' at the end stands for XML (Extensible Markup Language).</p>
+            <h2>Why .DOCX is Better</h2>
+            <ul>
+                <li><strong>Smaller File Sizes:</strong> DOCX files are actually compressed ZIP packages. This makes them significantly smaller than the old DOC files.</li>
+                <li><strong>Better Recovery:</strong> Because the file is structured as XML, it's easier to recover content if the file becomes corrupted.</li>
+                <li><strong>Open Standard:</strong> Unlike the proprietary DOC format, DOCX is an international standard, making it more compatible with other software.</li>
+            </ul>
+            <h2>How to Open a DOCX File</h2>
+            <p>You can open DOCX files with almost any modern word processor, including Microsoft Word, Apple Pages, and Google Docs.</p>
+            <h2>The Covertfily Advantage</h2>
+            <p>Most online converters send your DOCX files to a remote server. At <strong>Covertfily</strong>, we believe your documents should stay private. Our engine converts DOCX files 100% locally in your browser.</p>
+        </section>
+        <div class="cta-box">
+            <h2>Ready to convert your DOCX files?</h2>
+            <a href="index.html" class="btn-cta">Start Converting Now</a>
+        </div>
+    </template>
+
+    <template id="tpl-local-first-conversion">
+        <header class="article-header">
+            <span class="blog-tag">Privacy</span>
+            <h1 style="font-size: 2.5rem; line-height: 1.2; margin: 20px 0;">Why Local-First File Conversion is the Future of Privacy</h1>
+            <p style="color: var(--text-muted); font-weight: 500;">By Covertfily Team • April 9, 2026</p>
+        </header>
+        <section class="article-content">
+            <p>Every time you upload a document to a "free" online converter, you are sending your private data to a server you don't control. In an era where data is the new oil, this represents a significant security risk.</p>
+            <h2>The Hidden Risks of Cloud Conversion</h2>
+            <p>Most online tools store your files—at least temporarily—on their servers. You have no way to verify if they are truly deleted or being used to train AI models without your consent.</p>
+            <h2>What is Local-First Conversion?</h2>
+            <p>Local-first technology means the logic of the application runs entirely on your device. When you use Covertfily, your files stay on your hardware. The conversion happens in your RAM and outputs directly to your Downloads folder.</p>
+            <h2>Why Choose Covertfily?</h2>
+            <p>By leveraging modern browser technologies like WebAssembly, Covertfily offers the speed of the cloud with the security of a desktop app. We don't have a backend. We don't have a database.</p>
+        </section>
+        <div class="cta-box">
+            <h2>Experience True Privacy</h2>
+            <a href="index.html" class="btn-cta">Go to Covertfily Home</a>
+        </div>
+    </template>
+
+    <template id="tpl-introducing-covertfily">
+        <header class="article-header">
+            <span class="blog-tag">Open Source</span>
+            <h1 style="font-size: 2.5rem; line-height: 1.2; margin: 20px 0;">Introducing Covertfily: The MIT-Licensed Open Source Conversion Suite</h1>
+            <p style="color: var(--text-muted); font-weight: 500;">By Covertfily Team • April 9, 2026</p>
+        </header>
+        <section class="article-content">
+            <p>Today marks the official introduction of <strong>Covertfily</strong>, a project born out of a simple need: a file converter that respects its users. By releasing our code under the MIT License, we are inviting the world to audit and improve our tools.</p>
+            <h2>Built for Developers and Users Alike</h2>
+            <p>Most conversion tools are either bloated paid software or ad-riddled websites. Covertfily is different. We built it with a clean, modern interface and a "no-nonsense" philosophy. No account needed.</p>
+            <h2>A Modern Technology Stack</h2>
+            <p>Covertfily intelligently combines the best open-source libraries available today like jsPDF, PDF-lib, and PDF.js for lightning-fast manipulation.</p>
+            <h2>Transparency as a Feature</h2>
+            <p>We believe that when it comes to your files, transparency is a requirement, not a bonus. Because our code is open source, anyone can see exactly how their data is handled.</p>
+        </section>
+        <div class="cta-box">
+            <h2>Join the Mission</h2>
+            <a href="index.html" class="btn-cta">Start Converting</a>
+        </div>
+    </template>
+
+    <footer style="padding: 60px 20px; background: #0f172a; color: white; margin-top: 80px; border-top: 1px solid var(--border);">
+        <div style="max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; text-align: left;">
+            <div class="footer-col">
+                <div class="logo" style="color: white; margin-bottom: 20px;"><i class="fas fa-sync-alt"></i> <span>Covertfily</span></div>
+                <p style="color: #94A3B8; font-size: 0.9rem;">100% free, open source, and client-side conversion.</p>
+            </div>
+        </div>
+        <div style="border-top: 1px solid #334155; margin-top: 40px; padding-top: 20px; text-align: center; color: #64748B; font-size: 0.85rem;">MIT Licensed & Open Source • Covertfily</div>
+    </footer>
+
     <script>
-        // Tools search filtering
+        const blogIndex = document.getElementById('blogIndex');
+        const articleView = document.getElementById('articleView');
+        const articleContent = document.getElementById('articleContent');
+
+        function route() {
+            const hash = window.location.hash || '#home';
+            
+            if (hash === '#home') {
+                blogIndex.style.display = 'block';
+                articleView.classList.remove('active');
+                window.scrollTo(0, 0);
+            } else {
+                const articleId = hash.replace('#', '');
+                const template = document.getElementById(`tpl-${articleId}`);
+                
+                if (template) {
+                    articleContent.innerHTML = '';
+                    articleContent.appendChild(template.content.cloneNode(true));
+                    blogIndex.style.display = 'none';
+                    articleView.classList.add('active');
+                    window.scrollTo(0, 0);
+                    
+                    // Update Page Title
+                    const title = articleContent.querySelector('h1').textContent;
+                    document.title = `${title} - Covertfily Blog`;
+                } else {
+                    window.location.hash = '#home';
+                }
+            }
+        }
+
+        window.addEventListener('hashchange', route);
+        window.addEventListener('load', route);
+
+        // Tools search
         document.querySelector('.tools-search').addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
-            const tools = document.querySelectorAll('.tools-list a');
-            tools.forEach(tool => {
-                const text = tool.textContent.toLowerCase();
-                tool.classList.toggle('hidden', !text.includes(query));
+            document.querySelectorAll('.tools-list a').forEach(a => {
+                a.classList.toggle('hidden', !a.textContent.toLowerCase().includes(query));
             });
         });
     </script>
+    <script src="fallback.js"></script>
 </body>
 </html>

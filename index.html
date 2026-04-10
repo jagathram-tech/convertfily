@@ -24,15 +24,7 @@
     <meta property="og:description" content="Stop uploading your data. Convert and process files 100% locally in your browser.">
     <meta property="og:image" content="https://covertfily.com/og-image.png">
 
-    <!-- Once-per-device Ad Logic -->
-    <script>
-        if (!localStorage.getItem('adShown')) {
-            const s = document.createElement('script');
-            s.src = "https://jabturfembitter.com/78/e5/2c/78e52ce51f1ba2f301ca21694104c781.js";
-            document.head.appendChild(s);
-            localStorage.setItem('adShown', Date.now());
-        }
-    </script>
+    <meta property="og:image" content="https://covertfily.com/og-image.png">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,28 +72,24 @@
     
     <!-- Side Skyscraper Ads -->
     <div class="side-ad side-ad-left">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '3c6b7149f636d00e1bd554925cf7c901',
-                'format' : 'iframe',
-                'height' : 600,
-                'width' : 160,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://jabturfembitter.com/3c6b7149f636d00e1bd554925cf7c901/invoke.js"></script>
+        <!-- Paste EvaDav Left Script Here -->
+
+        <div class="ad-fallback" id="fallback-left">
+            <i class="fab fa-github"></i>
+            <h4>Support Open Source</h4>
+            <p>If you find Covertfily useful, consider starring us on GitHub!</p>
+            <a href="https://github.com/jagathram-tech/covertfily" class="btn-fallback">Star Repository</a>
+        </div>
     </div>
     <div class="side-ad side-ad-right">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '3c6b7149f636d00e1bd554925cf7c901',
-                'format' : 'iframe',
-                'height' : 600,
-                'width' : 160,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://jabturfembitter.com/3c6b7149f636d00e1bd554925cf7c901/invoke.js"></script>
+        <!-- Paste EvaDav Right Script Here -->
+
+        <div class="ad-fallback" id="fallback-right">
+            <i class="fas fa-heart"></i>
+            <h4>No Ads? No Problem.</h4>
+            <p>Our tools are free and private for everyone, forever.</p>
+            <a href="blog.html" class="btn-fallback">Read Our Mission</a>
+        </div>
     </div>
 
     <main>
@@ -293,5 +281,6 @@
     </footer>
 
     <script src="main.js"></script>
+    <script src="fallback.js"></script>
 </body>
 </html>

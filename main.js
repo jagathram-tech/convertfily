@@ -1292,7 +1292,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadingText = document.getElementById("loadingText");
     if (loadingText) loadingText.textContent = "Loading Media Engine...";
 
-    if (!window.FFmpeg) {
+    if (!window.FFmpegWASM) {
       await new Promise((resolve, reject) => {
         const script = document.createElement("script");
         script.src =
@@ -1301,6 +1301,8 @@ document.addEventListener("DOMContentLoaded", () => {
         script.onerror = reject;
         document.head.appendChild(script);
       });
+    }
+    if (!window.FFmpegUtil) {
       await new Promise((resolve, reject) => {
         const script = document.createElement("script");
         script.src = "https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js";
@@ -1310,7 +1312,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    const { FFmpeg } = window.FFmpeg;
+    const { FFmpeg } = window.FFmpegWASM;
     ffmpeg = new FFmpeg();
 
     ffmpeg.on("log", ({ message }) => {

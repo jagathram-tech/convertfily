@@ -430,12 +430,7 @@
 
             </div>
 
-            <div id="progressContainer" class="progress-container">
-                <div class="progress-label">Merging audio files...</div>
-                <div class="progress-bar">
-                    <div class="progress-bar-fill" id="progressFill"></div>
-                </div>
-            </div>
+
 
             <div class="action-buttons" id="actionButtons" style="display: none;">
                 <button class="btn-main" onclick="mergeAudio()">
@@ -636,19 +631,12 @@
                 return;
             }
 
-            const progressContainer = document.getElementById('progressContainer');
-            const progressLabel = progressContainer.querySelector('.progress-label');
-            const progressFill = document.getElementById('progressFill');
             const errorDiv = document.getElementById('errorMessage');
             errorDiv.textContent = '';
             errorDiv.classList.remove('error');
 
             let audioContext = null;
             try {
-                progressContainer.classList.add('active');
-                progressLabel.textContent = 'Decoding audio files...';
-                progressFill.style.width = '5%';
-
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioContext.state === 'suspended') {
                     await audioContext.resume();
@@ -662,7 +650,6 @@
                     const copy = arrayBuffer.slice(0);
                     const audioBuffer = await audioContext.decodeAudioData(copy);
                     decodedBuffers.push(audioBuffer);
-                    progressFill.style.width = (10 + ((i + 1) / audioFiles.length) * 35) + '%';
                 }
 
                 const sampleRate = decodedBuffers[0].sampleRate;
@@ -684,7 +671,6 @@
                     throw new Error('Could not determine audio duration from the uploaded files.');
                 }
 
-                progressLabel.textContent = 'Merging audio files...';
                 const offlineContext = new OfflineAudioContext(
                     numberOfChannels,
                     totalFrames,
@@ -701,22 +687,16 @@
                     if (i < decodedBuffers.length - 1) {
                         currentTime += silenceGap;
                     }
-                    progressFill.style.width = (45 + ((i + 1) / decodedBuffers.length) * 40) + '%';
                 }
 
                 const mergedAudioBuffer = await offlineContext.startRendering();
-                progressFill.style.width = '90%';
 
-                progressLabel.textContent = 'Encoding WAV...';
                 const wavBlob = audioBufferToWav(mergedAudioBuffer);
                 const filename = 'merged.wav';
 
                 triggerDownload(wavBlob, filename);
-                progressFill.style.width = '100%';
-                progressContainer.classList.remove('active');
             } catch (err) {
                 console.error('Audio merge error:', err);
-                progressContainer.classList.remove('active');
                 errorDiv.textContent = 'Error merging audio: ' + err.message;
                 errorDiv.classList.add('error');
             } finally {
@@ -825,6 +805,7 @@
     <script src="main.js"></script>
 </body>
 </html>
+
 
 
 

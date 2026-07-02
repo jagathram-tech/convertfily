@@ -36,6 +36,9 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=2.1.2">
+    <!-- FFmpeg.wasm -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         .merger-container {
@@ -683,6 +686,7 @@
             const originalBtnContent = mergeBtn.innerHTML;
 
             let audioContext = null;
+            let wavBlob = null;
             try {
                 mergeBtn.disabled = true;
                 mergeBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Merging...';
@@ -740,7 +744,7 @@
                 }
 
                 const mergedAudioBuffer = await offlineContext.startRendering();
-                const wavBlob = audioBufferToWav(mergedAudioBuffer);
+                wavBlob = audioBufferToWav(mergedAudioBuffer);
 
                 let outputBlob = wavBlob;
                 let filename = 'merged.wav';
@@ -754,8 +758,14 @@
                 triggerDownload(outputBlob, filename);
             } catch (err) {
                 console.error('Audio merge error:', err);
-                errorDiv.textContent = 'Error merging audio: ' + err.message;
-                errorDiv.classList.add('error');
+                if (selectedFormat !== 'wav' && wavBlob) {
+                    errorDiv.textContent = `Encoding to ${selectedFormat.toUpperCase()} failed (${err.message || err}). Downloading merged WAV instead.`;
+                    errorDiv.classList.add('error');
+                    triggerDownload(wavBlob, 'merged.wav');
+                } else {
+                    errorDiv.textContent = 'Error merging audio: ' + (err.message || err);
+                    errorDiv.classList.add('error');
+                }
             } finally {
                 mergeBtn.disabled = false;
                 mergeBtn.innerHTML = originalBtnContent;
@@ -864,6 +874,7 @@
     <script src="main.js"></script>
 </body>
 </html>
+
 
 
 

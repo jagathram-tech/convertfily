@@ -1337,9 +1337,93 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.loadFFmpeg = loadFFmpeg;
 
+  function audioBufferToWav(audioBuffer) {
+    const numberOfChannels = audioBuffer.numberOfChannels;
+    const sampleRate = audioBuffer.sampleRate;
+    const format = 1; // PCM
+    const bitDepth = 16;
+
+    const bytesPerSample = bitDepth / 8;
+    const blockAlign = numberOfChannels * bytesPerSample;
+
+    const channelData = [];
+    for (let channel = 0; channel < numberOfChannels; channel++) {
+      channelData.push(audioBuffer.getChannelData(channel));
+    }
+
+    const dataLength = audioBuffer.length * numberOfChannels * bytesPerSample;
+    const buffer = new ArrayBuffer(44 + dataLength);
+    const view = new DataView(buffer);
+
+    const writeString = (offset, string) => {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    };
+
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + dataLength, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, format, true);
+    view.setUint16(22, numberOfChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitDepth, true);
+    writeString(36, 'data');
+    view.setUint32(40, dataLength, true);
+
+    let offset = 44;
+    const volume = 0.8;
+    for (let i = 0; i < audioBuffer.length; i++) {
+      for (let channel = 0; channel < numberOfChannels; channel++) {
+        let sample = Math.max(-1, Math.min(1, channelData[channel][i])) * volume;
+        sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+        view.setInt16(offset, sample, true);
+        offset += 2;
+      }
+    }
+
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
+  async function convertAudioOffline(file) {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
+    const arrayBuffer = await file.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    const wavBlob = audioBufferToWav(audioBuffer);
+    await audioContext.close();
+    return wavBlob;
+  }
+
   // Convert Video & Audio using actual FFmpeg.wasm Engine
   async function convertMedia(file, targetFormat) {
-    const loadingText = document.getElementById("loadingText");
+    const ext = file.name.split(".").pop().toLowerCase();
+    const audioFormats = ["mp3", "wav", "ogg", "flac", "aac", "m4a", "webm"];
+    const isAudio = file.type.startsWith("audio/") || audioFormats.includes(ext);
+
+    // If target is WAV and input is audio, do it 100% offline via Web Audio API
+    if (targetFormat === "wav" && isAudio) {
+      try {
+        setConversionProgress(20, "Decoding audio...");
+        const wavBlob = await convertAudioOffline(file);
+        setConversionProgress(90, "Finalizing file...");
+        const url = URL.createObjectURL(wavBlob);
+        downloadFile(
+          url,
+          file.name.replace(/\.[^/.]+$/, "") + ".wav"
+        );
+        setConversionProgress(100, "Done!");
+        return;
+      } catch (err) {
+        console.error("Offline WAV conversion failed, falling back to FFmpeg:", err);
+      }
+    }
 
     try {
       const ff = await loadFFmpeg();
@@ -1387,6 +1471,28 @@ document.addEventListener("DOMContentLoaded", () => {
       await ff.deleteFile(outputName);
     } catch (error) {
       console.error("FFmpeg Conversion Error:", error);
+
+      // Fallback: If it's an audio file and targetFormat is not wav, try to convert to wav instead
+      if (isAudio && targetFormat !== "wav") {
+        try {
+          setConversionProgress(50, "Encoding failed. Falling back to WAV conversion...");
+          const wavBlob = await convertAudioOffline(file);
+          setConversionProgress(90, "Finalizing file...");
+          const url = URL.createObjectURL(wavBlob);
+          downloadFile(
+            url,
+            file.name.replace(/\.[^/.]+$/, "") + ".wav"
+          );
+          setConversionProgress(100, "Done!");
+          alert(
+            `Conversion to ${targetFormat.toUpperCase()} failed (Media Engine unsupported). File has been downloaded as WAV instead.`
+          );
+          return;
+        } catch (fallbackError) {
+          console.error("Fallback WAV conversion also failed:", fallbackError);
+        }
+      }
+
       alert(
         "Media conversion failed. The format may be unsupported by the browser engine.",
       );

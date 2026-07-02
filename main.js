@@ -1313,21 +1313,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const { FFmpeg } = window.FFmpegWASM;
+    const { toBlobURL } = window.FFmpegUtil;
     ffmpeg = new FFmpeg();
 
     ffmpeg.on("log", ({ message }) => {
       console.log(message);
     });
 
-    // Use single-threaded core for broad browser compatibility without COOP/COEP
-    const coreURL =
-      "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js";
-    const wasmURL =
-      "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm";
+    // Blob URLs bypass cross-origin Worker/CORS restrictions when loading from CDN
+    const coreBase =
+      "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+    const workerURL =
+      "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js";
 
     await ffmpeg.load({
-      coreURL: coreURL,
-      wasmURL: wasmURL,
+      coreURL: await toBlobURL(`${coreBase}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${coreBase}/ffmpeg-core.wasm`, "application/wasm"),
+      classWorkerURL: await toBlobURL(workerURL, "text/javascript"),
     });
 
     return ffmpeg;

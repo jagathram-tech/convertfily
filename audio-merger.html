@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -36,9 +36,6 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=2.1.2">
-    <!-- FFmpeg.wasm (MP3 output) -->
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
-    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         .merger-container {
@@ -430,13 +427,7 @@
                     </div>
                 </div>
 
-                <div class="option-group">
-                    <div class="option-label">Output Format</div>
-                    <div class="format-selector">
-                        <div class="format-option active" onclick="selectFormat('mp3', this)">MP3</div>
-                        <div class="format-option" onclick="selectFormat('wav', this)">WAV</div>
-                    </div>
-                </div>
+
             </div>
 
             <div id="progressContainer" class="progress-container">
@@ -522,7 +513,6 @@
 
     <script>
         let audioFiles = [];
-        let selectedFormat = 'mp3';
         let sortableInstance = null;
 
         const AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'flac', 'm4a', 'aac', 'webm'];
@@ -592,13 +582,7 @@
             document.getElementById('silenceLabel').textContent = e.target.value + 's';
         });
 
-        function selectFormat(format, el) {
-            selectedFormat = format;
-            document.querySelectorAll('.format-option').forEach((node) => {
-                node.classList.remove('active');
-            });
-            if (el) el.classList.add('active');
-        }
+
 
         function renderFiles() {
             const container = document.getElementById('filesContainer');
@@ -644,15 +628,6 @@
             renderFiles();
         }
 
-        async function encodeWavToMp3(wavBlob) {
-            const ff = await window.loadFFmpeg();
-            const { fetchFile } = window.FFmpegUtil;
-            await ff.writeFile('merged.wav', await fetchFile(wavBlob));
-            await ff.exec(['-i', 'merged.wav', '-codec:a', 'libmp3lame', '-q:a', '2', 'merged.mp3']);
-            const data = await ff.readFile('merged.mp3');
-            return new Blob([data.buffer], { type: 'audio/mpeg' });
-        }
-
         async function mergeAudio() {
             if (audioFiles.length < 2) {
                 const errorDiv = document.getElementById('errorMessage');
@@ -668,12 +643,13 @@
             errorDiv.textContent = '';
             errorDiv.classList.remove('error');
 
+            let audioContext = null;
             try {
                 progressContainer.classList.add('active');
                 progressLabel.textContent = 'Decoding audio files...';
                 progressFill.style.width = '5%';
 
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioContext.state === 'suspended') {
                     await audioContext.resume();
                 }
@@ -731,20 +707,11 @@
                 const mergedAudioBuffer = await offlineContext.startRendering();
                 progressFill.style.width = '90%';
 
-                let blob;
-                let filename;
+                progressLabel.textContent = 'Encoding WAV...';
                 const wavBlob = audioBufferToWav(mergedAudioBuffer);
+                const filename = 'merged.wav';
 
-                if (selectedFormat === 'mp3') {
-                    progressLabel.textContent = 'Encoding MP3...';
-                    blob = await encodeWavToMp3(wavBlob);
-                    filename = 'merged.mp3';
-                } else {
-                    blob = wavBlob;
-                    filename = 'merged.wav';
-                }
-
-                triggerDownload(blob, filename);
+                triggerDownload(wavBlob, filename);
                 progressFill.style.width = '100%';
                 progressContainer.classList.remove('active');
             } catch (err) {
@@ -752,6 +719,14 @@
                 progressContainer.classList.remove('active');
                 errorDiv.textContent = 'Error merging audio: ' + err.message;
                 errorDiv.classList.add('error');
+            } finally {
+                if (audioContext) {
+                    try {
+                        await audioContext.close();
+                    } catch (e) {
+                        console.error('Error closing AudioContext:', e);
+                    }
+                }
             }
         }
 
@@ -845,23 +820,12 @@
             }
         });
 
-        // Mobile nav
-        document.querySelector('.menu-toggle')?.addEventListener('click', function() {
-            document.body.classList.toggle('nav-active');
-        });
 
-        document.querySelectorAll('.tool-search').forEach(search => {
-            search.addEventListener('input', function(e) {
-                const query = this.value.toLowerCase();
-                this.closest('.dropdown-content').querySelectorAll('.tool-list a').forEach(link => {
-                    link.style.display = link.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
-                });
-            });
-        });
     </script>
     <script src="main.js"></script>
 </body>
 </html>
+
 
 
 

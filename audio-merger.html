@@ -160,11 +160,16 @@
             border-radius: 0.5rem;
         }
         .format-selector {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 0.625rem;
         }
+        @media (min-width: 480px) {
+            .format-selector {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
         .format-option {
-            flex: 1;
             padding: 0.625rem;
             border: 2px solid var(--border);
             border-radius: 0.5rem;
@@ -427,7 +432,17 @@
                     </div>
                 </div>
 
-
+                <div class="option-group">
+                    <div class="option-label">Output Format</div>
+                    <div class="format-selector">
+                        <div class="format-option active" onclick="selectFormat('mp3', this)">MP3</div>
+                        <div class="format-option" onclick="selectFormat('wav', this)">WAV</div>
+                        <div class="format-option" onclick="selectFormat('aac', this)">AAC</div>
+                        <div class="format-option" onclick="selectFormat('ogg', this)">OGG</div>
+                        <div class="format-option" onclick="selectFormat('m4a', this)">M4A</div>
+                        <div class="format-option" onclick="selectFormat('flac', this)">FLAC</div>
+                    </div>
+                </div>
             </div>
 
 
@@ -508,6 +523,7 @@
 
     <script>
         let audioFiles = [];
+        let selectedFormat = 'mp3';
         let sortableInstance = null;
 
         const AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'flac', 'm4a', 'aac', 'webm'];
@@ -577,6 +593,34 @@
             document.getElementById('silenceLabel').textContent = e.target.value + 's';
         });
 
+        function selectFormat(format, el) {
+            selectedFormat = format;
+            document.querySelectorAll('.format-option').forEach((node) => {
+                node.classList.remove('active');
+            });
+            if (el) el.classList.add('active');
+        }
+
+        async function transcodeAudio(wavBlob, targetFormat) {
+            const ff = await window.loadFFmpeg();
+            const { fetchFile } = window.FFmpegUtil;
+            const inputName = 'input.wav';
+            const outputName = `output.${targetFormat}`;
+
+            await ff.writeFile(inputName, await fetchFile(wavBlob));
+            await ff.exec(['-i', inputName, outputName]);
+            const data = await ff.readFile(outputName);
+
+            await ff.deleteFile(inputName);
+            await ff.deleteFile(outputName);
+
+            let mimeType = `audio/${targetFormat}`;
+            if (targetFormat === 'mp3') mimeType = 'audio/mpeg';
+            else if (targetFormat === 'm4a') mimeType = 'audio/mp4';
+
+            return new Blob([data.buffer], { type: mimeType });
+        }
+
 
 
         function renderFiles() {
@@ -635,8 +679,14 @@
             errorDiv.textContent = '';
             errorDiv.classList.remove('error');
 
+            const mergeBtn = document.querySelector('.action-buttons button');
+            const originalBtnContent = mergeBtn.innerHTML;
+
             let audioContext = null;
             try {
+                mergeBtn.disabled = true;
+                mergeBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Merging...';
+
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioContext.state === 'suspended') {
                     await audioContext.resume();
@@ -690,16 +740,25 @@
                 }
 
                 const mergedAudioBuffer = await offlineContext.startRendering();
-
                 const wavBlob = audioBufferToWav(mergedAudioBuffer);
-                const filename = 'merged.wav';
 
-                triggerDownload(wavBlob, filename);
+                let outputBlob = wavBlob;
+                let filename = 'merged.wav';
+
+                if (selectedFormat !== 'wav') {
+                    mergeBtn.innerHTML = `<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Encoding ${selectedFormat.toUpperCase()}...`;
+                    outputBlob = await transcodeAudio(wavBlob, selectedFormat);
+                    filename = `merged.${selectedFormat}`;
+                }
+
+                triggerDownload(outputBlob, filename);
             } catch (err) {
                 console.error('Audio merge error:', err);
                 errorDiv.textContent = 'Error merging audio: ' + err.message;
                 errorDiv.classList.add('error');
             } finally {
+                mergeBtn.disabled = false;
+                mergeBtn.innerHTML = originalBtnContent;
                 if (audioContext) {
                     try {
                         await audioContext.close();
@@ -805,6 +864,7 @@
     <script src="main.js"></script>
 </body>
 </html>
+
 
 
 

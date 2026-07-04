@@ -1,0 +1,3 @@
+## 2025-05-18 - Keyboard Accessible Custom CTAs
+**Learning:** Core interactive elements in this app are often implemented as non-semantic tags (e.g., `<div id="dropzone" onclick=...>`). These are invisible to keyboard and screen reader users by default.
+**Action:** Always explicitly make non-semantic CTAs keyboard accessible by adding `role="button"`, `tabindex="0"`, `onkeydown` handlers for 'Enter' and 'Space' keys (including `event.preventDefault()`), and standard Tailwind focus classes (e.g., `focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none`). Add `aria-hidden="true"` to nested icon-only elements to prevent double-reading by screen readers.

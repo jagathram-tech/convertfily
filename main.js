@@ -15,7 +15,7 @@ const formatMapping = {
   mov: ["mp4", "webm", "avi", "mkv", "mp3"],
   avi: ["mp4", "webm", "mov", "mp3"],
   mkv: ["mp4", "webm", "mov", "mp3"],
-  flv: ["mp4", "mp3"],
+  flv: ["mp4"],
   wmv: ["mp4", "mp3"],
   mp3: ["wav", "ogg", "aac", "m4a", "flac"],
   wav: ["mp3", "ogg", "aac", "m4a", "flac"],

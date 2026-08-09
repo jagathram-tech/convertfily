@@ -552,7 +552,11 @@
                         file.name;
                 } catch (err) {
                     console.error(err);
-                    alert("Conversion failed: " + err.message);
+                    const detail =
+                        (err && err.message) ||
+                        (typeof err === "string" ? err : null) ||
+                        "Unknown error";
+                    alert("Conversion failed: " + detail);
                     resetConverter();
                 }
             }

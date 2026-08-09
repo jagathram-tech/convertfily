@@ -630,8 +630,13 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       console.error(error);
       setConversionProgress(0, "Conversion failed.");
-      alert(`Error converting file ${file.name}: ${error.message}`);
-      throw error;
+      const detail =
+        (error && error.message) ||
+        (typeof error === "string" ? error : null) ||
+        (typeof error === "number" ? "FFmpeg exit code " + error : null) ||
+        "Unknown error";
+      // Re-throw a real Error so UI catch blocks never show "undefined"
+      throw error instanceof Error ? error : new Error(detail);
     }
   };
 
@@ -1561,11 +1566,245 @@ document.addEventListener("DOMContentLoaded", () => {
     return wavBlob;
   }
 
+  function mediaErrorMessage(error) {
+    if (!error) return "Unknown media conversion error";
+    if (typeof error === "string") return error;
+    if (typeof error === "number") return "FFmpeg exited with code " + error;
+    if (error.message) return error.message;
+    try {
+      return String(error);
+    } catch (_) {
+      return "Unknown media conversion error";
+    }
+  }
+
+  function mimeForMediaTarget(targetFormat) {
+    const map = {
+      webm: "video/webm",
+      mp4: "video/mp4",
+      mov: "video/quicktime",
+      avi: "video/x-msvideo",
+      mkv: "video/x-matroska",
+      mp3: "audio/mpeg",
+      wav: "audio/wav",
+      ogg: "audio/ogg",
+      flac: "audio/flac",
+      aac: "audio/aac",
+      m4a: "audio/mp4",
+    };
+    return map[targetFormat] || "application/octet-stream";
+  }
+
+  /** Explicit codecs — bare -i in/out fails for WebM (no auto libvpx pick). */
+  function buildFFmpegCommand(inputName, outputName, targetFormat) {
+    const common = ["-i", inputName, "-y", "-hide_banner"];
+    switch (targetFormat) {
+      case "webm":
+        // Prefer VP8+Vorbis (widely present in ffmpeg.wasm core builds)
+        return [
+          ...common,
+          "-c:v",
+          "libvpx",
+          "-b:v",
+          "1M",
+          "-crf",
+          "30",
+          "-deadline",
+          "realtime",
+          "-cpu-used",
+          "8",
+          "-c:a",
+          "libvorbis",
+          "-b:a",
+          "128k",
+          outputName,
+        ];
+      case "mp4":
+      case "mov":
+      case "mkv":
+        return [
+          ...common,
+          "-c:v",
+          "libx264",
+          "-preset",
+          "ultrafast",
+          "-crf",
+          "28",
+          "-c:a",
+          "aac",
+          "-b:a",
+          "128k",
+          "-movflags",
+          "+faststart",
+          outputName,
+        ];
+      case "avi":
+        return [
+          ...common,
+          "-c:v",
+          "mpeg4",
+          "-q:v",
+          "5",
+          "-c:a",
+          "mp3",
+          "-b:a",
+          "128k",
+          outputName,
+        ];
+      case "mp3":
+        return [
+          ...common,
+          "-vn",
+          "-c:a",
+          "libmp3lame",
+          "-b:a",
+          "192k",
+          outputName,
+        ];
+      case "wav":
+        return [...common, "-vn", "-c:a", "pcm_s16le", outputName];
+      case "ogg":
+        return [
+          ...common,
+          "-vn",
+          "-c:a",
+          "libvorbis",
+          "-b:a",
+          "128k",
+          outputName,
+        ];
+      case "aac":
+      case "m4a":
+        return [...common, "-vn", "-c:a", "aac", "-b:a", "192k", outputName];
+      case "flac":
+        return [...common, "-vn", "-c:a", "flac", outputName];
+      default:
+        return [...common, outputName];
+    }
+  }
+
+  /** Browser-native WebM encode via MediaRecorder (fallback when FFmpeg lacks libvpx). */
+  async function convertVideoToWebmBrowser(file) {
+    if (typeof MediaRecorder === "undefined") {
+      throw new Error("MediaRecorder is not available in this browser.");
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    video.src = objectUrl;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = "auto";
+    video.crossOrigin = "anonymous";
+
+    try {
+      await new Promise((resolve, reject) => {
+        video.onloadedmetadata = () => resolve();
+        video.onerror = () =>
+          reject(new Error("Browser could not decode this video for WebM conversion."));
+      });
+
+      if (!video.videoWidth || !video.videoHeight) {
+        throw new Error("Video has no visual track to convert to WebM.");
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      const fps = 30;
+      const canvasStream = canvas.captureStream(fps);
+
+      // Prefer real media stream (includes audio when browser allows it)
+      let stream;
+      if (typeof video.captureStream === "function") {
+        stream = video.captureStream();
+      } else if (typeof video.mozCaptureStream === "function") {
+        stream = video.mozCaptureStream();
+      } else {
+        stream = canvasStream;
+      }
+
+      // If captureStream has no video tracks, use canvas draws
+      if (!stream.getVideoTracks().length) {
+        stream = canvasStream;
+      }
+
+      const mimeCandidates = [
+        "video/webm;codecs=vp9,opus",
+        "video/webm;codecs=vp8,opus",
+        "video/webm;codecs=vp9",
+        "video/webm;codecs=vp8",
+        "video/webm",
+      ];
+      const mimeType =
+        mimeCandidates.find((t) => MediaRecorder.isTypeSupported(t)) || "";
+      if (!mimeType) {
+        throw new Error("This browser cannot record WebM (MediaRecorder unsupported).");
+      }
+
+      const chunks = [];
+      const recorder = new MediaRecorder(stream, {
+        mimeType,
+        videoBitsPerSecond: 2_500_000,
+      });
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+
+      const stopped = new Promise((resolve, reject) => {
+        recorder.onstop = () => resolve();
+        recorder.onerror = () =>
+          reject(new Error("MediaRecorder failed while encoding WebM."));
+      });
+
+      let drawId = 0;
+      const useCanvasDraw = stream === canvasStream;
+      const draw = () => {
+        if (useCanvasDraw && !video.paused && !video.ended) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
+        drawId = requestAnimationFrame(draw);
+      };
+
+      setConversionProgress(30, "Encoding WebM in browser...");
+      recorder.start(200);
+      draw();
+      await video.play();
+
+      await new Promise((resolve) => {
+        video.onended = resolve;
+        // Safety timeout for odd streams that never fire ended
+        const ms = Math.max(1000, (video.duration || 30) * 1000 + 2000);
+        setTimeout(resolve, ms);
+      });
+
+      if (recorder.state !== "inactive") recorder.stop();
+      cancelAnimationFrame(drawId);
+      await stopped;
+
+      if (!chunks.length) {
+        throw new Error("WebM encode produced an empty file.");
+      }
+
+      return new Blob(chunks, { type: "video/webm" });
+    } finally {
+      try {
+        video.pause();
+      } catch (_) {}
+      URL.revokeObjectURL(objectUrl);
+    }
+  }
+
   // Convert Video & Audio using actual FFmpeg.wasm Engine
   async function convertMedia(file, targetFormat) {
     const ext = file.name.split(".").pop().toLowerCase();
-    const audioFormats = ["mp3", "wav", "ogg", "flac", "aac", "m4a", "webm"];
-    const isAudio = file.type.startsWith("audio/") || audioFormats.includes(ext);
+    const audioOnlyExt = ["mp3", "wav", "ogg", "flac", "aac", "m4a", "opus", "wma"];
+    const isAudio =
+      file.type.startsWith("audio/") || audioOnlyExt.includes(ext);
+    const isVideoTarget = ["mp4", "webm", "mov", "avi", "mkv"].includes(
+      targetFormat,
+    );
 
     // If target is WAV and input is audio, do it 100% offline via Web Audio API
     if (targetFormat === "wav" && isAudio) {
@@ -1576,7 +1815,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const url = URL.createObjectURL(wavBlob);
         downloadFile(
           url,
-          file.name.replace(/\.[^/.]+$/, "") + ".wav"
+          file.name.replace(/\.[^/.]+$/, "") + ".wav",
         );
         setConversionProgress(100, "Done!");
         return;
@@ -1585,79 +1824,116 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    const safeBase = (file.name || "media")
+      .replace(/\.[^/.]+$/, "")
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .slice(0, 40) || "media";
+    const inputName = "input_" + safeBase + "." + (ext || "bin");
+    const outputName = "output." + targetFormat;
+    let lastError = null;
+
     try {
+      setConversionProgress(12, "Loading media engine...");
       const ff = await loadFFmpeg();
       const { fetchFile } = window.FFmpegUtil;
 
       setConversionProgress(18, "Writing file to memory...");
-      const inputName = "input_" + file.name.replace(/[^a-zA-Z0-9.]/g, "");
-      const outputName = "output." + targetFormat;
+      try {
+        await ff.deleteFile(inputName);
+      } catch (_) {}
+      try {
+        await ff.deleteFile(outputName);
+      } catch (_) {}
 
       await ff.writeFile(inputName, await fetchFile(file));
 
       setConversionProgress(24, "Converting media...");
-
       ff.on("progress", ({ progress }) => {
-        const pct = Math.max(0, Math.min(100, Math.round(progress * 100)));
+        const pct = Math.max(0, Math.min(100, Math.round((progress || 0) * 100)));
         setConversionProgress(24 + pct * 0.64, `Converting media... ${pct}%`);
       });
 
-      await ff.exec(["-i", inputName, outputName]);
+      const cmd = buildFFmpegCommand(inputName, outputName, targetFormat);
+      console.log("FFmpeg command:", cmd.join(" "));
+      await ff.exec(cmd);
 
       setConversionProgress(92, "Finalizing file...");
       const data = await ff.readFile(outputName);
+      if (!data || !data.length) {
+        throw new Error("FFmpeg produced an empty output file.");
+      }
 
-      let mimeType = "video/mp4";
-      if (targetFormat === "webm") mimeType = "video/webm";
-      else if (targetFormat === "mov") mimeType = "video/quicktime";
-      else if (targetFormat === "avi") mimeType = "video/x-msvideo";
-      else if (targetFormat === "mkv") mimeType = "video/x-matroska";
-      else if (targetFormat === "mp3") mimeType = "audio/mp3";
-      else if (targetFormat === "wav") mimeType = "audio/wav";
-      else if (targetFormat === "ogg") mimeType = "audio/ogg";
-      else if (targetFormat === "flac") mimeType = "audio/flac";
-      else if (targetFormat === "aac") mimeType = "audio/aac";
-      else if (targetFormat === "m4a") mimeType = "audio/m4a";
-
-      const convertedBlob = new Blob([data.buffer], { type: mimeType });
+      const mimeType = mimeForMediaTarget(targetFormat);
+      // Pass Uint8Array directly — data.buffer can be a larger underlying buffer
+      const convertedBlob = new Blob([data], { type: mimeType });
       const url = URL.createObjectURL(convertedBlob);
       downloadFile(
         url,
         file.name.replace(/\.[^/.]+$/, "") + "." + targetFormat,
       );
 
-      // Clean up memory
-      await ff.deleteFile(inputName);
-      await ff.deleteFile(outputName);
+      try {
+        await ff.deleteFile(inputName);
+        await ff.deleteFile(outputName);
+      } catch (_) {}
+
+      setConversionProgress(100, "Done!");
+      return;
     } catch (error) {
+      lastError = error;
       console.error("FFmpeg Conversion Error:", error);
-
-      // Fallback: If it's an audio file and targetFormat is not wav, try to convert to wav instead
-      if (isAudio && targetFormat !== "wav") {
-        try {
-          setConversionProgress(50, "Encoding failed. Falling back to WAV conversion...");
-          const wavBlob = await convertAudioOffline(file);
-          setConversionProgress(90, "Finalizing file...");
-          const url = URL.createObjectURL(wavBlob);
-          downloadFile(
-            url,
-            file.name.replace(/\.[^/.]+$/, "") + ".wav"
-          );
-          setConversionProgress(100, "Done!");
-          alert(
-            `Conversion to ${targetFormat.toUpperCase()} failed (Media Engine unsupported). File has been downloaded as WAV instead.`
-          );
-          return;
-        } catch (fallbackError) {
-          console.error("Fallback WAV conversion also failed:", fallbackError);
-        }
-      }
-
-      alert(
-        "Media conversion failed. The format may be unsupported by the browser engine.",
-      );
-      throw error;
     }
+
+    // WebM video fallback: browser MediaRecorder (no libvpx required)
+    if (targetFormat === "webm" && !isAudio) {
+      try {
+        setConversionProgress(28, "FFmpeg WebM failed — trying browser encoder...");
+        const webmBlob = await convertVideoToWebmBrowser(file);
+        setConversionProgress(95, "Finalizing file...");
+        downloadFile(
+          webmBlob,
+          file.name.replace(/\.[^/.]+$/, "") + ".webm",
+        );
+        setConversionProgress(100, "Done!");
+        return;
+      } catch (webmErr) {
+        console.error("Browser WebM fallback failed:", webmErr);
+        lastError = webmErr;
+      }
+    }
+
+    // Audio fallback → WAV
+    if (isAudio && targetFormat !== "wav") {
+      try {
+        setConversionProgress(
+          50,
+          "Encoding failed. Falling back to WAV conversion...",
+        );
+        const wavBlob = await convertAudioOffline(file);
+        setConversionProgress(90, "Finalizing file...");
+        downloadFile(
+          wavBlob,
+          file.name.replace(/\.[^/.]+$/, "") + ".wav",
+        );
+        setConversionProgress(100, "Done!");
+        // Soft notice only — conversion still produced a downloadable file
+        console.warn(
+          `Conversion to ${targetFormat.toUpperCase()} failed; delivered WAV instead.`,
+        );
+        return;
+      } catch (fallbackError) {
+        console.error("Fallback WAV conversion also failed:", fallbackError);
+        lastError = fallbackError;
+      }
+    }
+
+    const detail = mediaErrorMessage(lastError);
+    throw new Error(
+      "Media conversion failed" +
+        (isVideoTarget ? " (video engine)" : "") +
+        ": " +
+        detail,
+    );
   }
 
   async function convertDocx(file, targetFormat) {

@@ -26,7 +26,6 @@
 <a href="brightness-map.html"><i class="fas fa-sun"></i> Brightness Map</a>
 <a href="stereogram.html"><i class="fas fa-eye"></i> Stereogram</a>
 <a href="steganography.html"><i class="fas fa-user-secret"></i> Steganography</a>
-<a href="collage-maker.html"><i class="fas fa-th-large"></i> Collage Maker</a>
 <a href="ocr.html"><i class="fas fa-file-alt"></i> Image to Text (OCR)</a>
 <a href="qr-code-generator.html"><i class="fas fa-qrcode"></i> QR Code Generator</a>
 <a href="barcode-generator.html"><i class="fas fa-barcode"></i> Barcode Generator</a>
@@ -56,7 +55,6 @@
 <a href="brightness-map.html"><i class="fas fa-sun"></i> Brightness Map</a>
 <a href="stereogram.html"><i class="fas fa-eye"></i> Stereogram</a>
 <a href="steganography.html"><i class="fas fa-user-secret"></i> Steganography</a>
-<a href="collage-maker.html"><i class="fas fa-th-large"></i> Collage Maker</a>
 <a href="ocr.html"><i class="fas fa-file-alt"></i> Image to Text (OCR)</a>
 <a href="video-trimmer.html"><i class="fas fa-scissors"></i> Video Trimmer</a>
 <a href="video-frame-extractor.html"><i class="fas fa-images"></i> Frame Extractor</a>

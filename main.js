@@ -369,7 +369,8 @@ document.addEventListener("DOMContentLoaded", () => {
     turndown: "https://unpkg.com/turndown/dist/turndown.js",
     mammoth: "https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js",
     utif: "https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js",
-    heic2any: "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js",
+    // heic-to (libheif 1.22) — much faster than legacy heic2any
+    heicTo: "https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js",
   };
 
   const scriptLoadPromises = {};
@@ -428,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (source === "md" && target === "html") needs.add("marked");
     if (source === "html" && target === "md") needs.add("turndown");
     if (source === "tiff") needs.add("utif");
-    if (source === "heic") needs.add("heic2any");
+    // HEIC lib is lazy-loaded only when native decode fails (see convertHeicImage)
     if (source === "zip" && target === "zip") needs.add("jszip");
     if (spreadsheet.includes(source) && target === "pdf") {
       needs.add("xlsx");
@@ -487,7 +488,7 @@ document.addEventListener("DOMContentLoaded", () => {
           await convertPDFToImages(file, targetFormat);
         } else if (sourceFormat === "tiff") {
           await convertTiffImage(file, targetFormat);
-        } else if (sourceFormat === "heic") {
+        } else if (sourceFormat === "heic" || sourceFormat === "heif") {
           await convertHeicImage(file, targetFormat);
         } else {
           await convertImage(file, targetFormat);
@@ -999,23 +1000,132 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  function canvasToBlobAsync(canvas, mimeType, quality) {
+    return new Promise((resolve, reject) => {
+      if (typeof canvas.toBlob === "function") {
+        canvas.toBlob(
+          (blob) =>
+            blob
+              ? resolve(blob)
+              : reject(new Error("Image encoding failed")),
+          mimeType,
+          quality,
+        );
+        return;
+      }
+      try {
+        const dataUrl = canvas.toDataURL(mimeType, quality);
+        const parts = dataUrl.split(",");
+        const bin = atob(parts[1] || "");
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        resolve(new Blob([bytes], { type: mimeType }));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  async function ensureHeicLib() {
+    if (typeof HeicTo === "function") return;
+    await loadScriptOnce(SCRIPT_LIBS.heicTo);
+    if (typeof HeicTo !== "function") {
+      throw new Error("Failed to load the HEIC converter engine.");
+    }
+  }
+
+  function heicOutputMime(targetFormat) {
+    const t = (targetFormat || "").toLowerCase();
+    if (t === "png") return "image/png";
+    if (t === "webp") return "image/webp";
+    if (t === "jpg" || t === "jpeg") return "image/jpeg";
+    return null;
+  }
+
+  async function encodeBitmapToFormat(bitmap, targetFormat, quality = 0.9) {
+    const mime = heicOutputMime(targetFormat);
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    const ctx = canvas.getContext("2d", {
+      alpha: mime === "image/png" || mime === "image/webp",
+    });
+    if (mime === "image/jpeg" || targetFormat === "jpg" || targetFormat === "jpeg") {
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.drawImage(bitmap, 0, 0);
+    if (typeof bitmap.close === "function") bitmap.close();
+
+    if (mime) {
+      return canvasToBlobAsync(canvas, mime, quality);
+    }
+    return canvasToOutput(canvas, targetFormat, quality);
+  }
+
+  /**
+   * Fast HEIC/HEIF conversion:
+   * 1) Native createImageBitmap (Safari) — no lib needed
+   * 2) heic-to single-pass decode→jpg/png (libheif 1.22)
+   * Avoids the old heic2any path that decoded HEIC→JPEG then re-encoded again.
+   */
   async function convertHeicImage(file, targetFormat) {
-    if (typeof heic2any === "undefined") {
-      await loadScriptOnce(SCRIPT_LIBS.heic2any);
+    const outExt =
+      targetFormat === "jpeg" ? "jpg" : (targetFormat || "jpg").toLowerCase();
+    const outName = file.name.replace(/\.[^/.]+$/i, "") + `.${outExt}`;
+    const mime = heicOutputMime(targetFormat);
+    const quality = 0.9;
+
+    setConversionProgress(10, "Decoding HEIC...");
+    await yieldToUi();
+
+    // Fast path A: browser-native HEIC decode (Safari / supporting engines)
+    try {
+      const bitmap = await createImageBitmap(file);
+      setConversionProgress(55, `Encoding ${outExt.toUpperCase()}...`);
+      await yieldToUi();
+      const output = await encodeBitmapToFormat(bitmap, targetFormat, quality);
+      setConversionProgress(98, "Preparing download...");
+      downloadFile(output, outName);
+      return;
+    } catch (_) {
+      /* not natively decodable — use libheif via heic-to */
     }
 
-    const converted = await heic2any({
-      blob: file,
-      toType: "image/jpeg",
-      quality: 0.92,
-    });
-    const jpegBlob = Array.isArray(converted) ? converted[0] : converted;
-    const jpegFile = new File(
-      [jpegBlob],
-      file.name.replace(/\.[^/.]+$/, ".jpg"),
-      { type: "image/jpeg" },
-    );
-    await convertImage(jpegFile, targetFormat);
+    setConversionProgress(20, "Loading HEIC engine...");
+    await ensureHeicLib();
+    setConversionProgress(35, "Converting HEIC...");
+    await yieldToUi();
+
+    // Fast path B: single-pass library convert straight to target mime
+    if (mime) {
+      const blob = await HeicTo({
+        blob: file,
+        type: mime,
+        quality: mime === "image/png" ? undefined : quality,
+      });
+      setConversionProgress(98, "Preparing download...");
+      downloadFile(blob, outName);
+      return;
+    }
+
+    // Path C: need pixels for BMP etc. — decode to bitmap then encode
+    let bitmap;
+    try {
+      bitmap = await HeicTo({ blob: file, type: "bitmap" });
+    } catch (_) {
+      const jpegBlob = await HeicTo({
+        blob: file,
+        type: "image/jpeg",
+        quality,
+      });
+      bitmap = await createImageBitmap(jpegBlob);
+    }
+    setConversionProgress(70, `Encoding ${outExt.toUpperCase()}...`);
+    await yieldToUi();
+    const output = await encodeBitmapToFormat(bitmap, targetFormat, quality);
+    setConversionProgress(98, "Preparing download...");
+    downloadFile(output, outName);
   }
 
   async function extractPdfText(file) {
@@ -1195,19 +1305,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (fmt === "heic" || fmt === "heif" || ext === "heic" || ext === "heif") {
-      if (typeof heic2any === "undefined") {
-        await loadScriptOnce(SCRIPT_LIBS.heic2any);
+      let jpegBlob;
+      try {
+        const bitmap = await createImageBitmap(file);
+        const canvas = document.createElement("canvas");
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(bitmap, 0, 0);
+        if (typeof bitmap.close === "function") bitmap.close();
+        jpegBlob = await canvasToBlobAsync(canvas, "image/jpeg", 0.9);
+      } catch (_) {
+        await ensureHeicLib();
+        jpegBlob = await HeicTo({
+          blob: file,
+          type: "image/jpeg",
+          quality: 0.9,
+        });
       }
-      const converted = await heic2any({
-        blob: file,
-        toType: "image/jpeg",
-        quality: 0.92,
-      });
-      const jpegBlob = Array.isArray(converted) ? converted[0] : converted;
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
-        reader.onerror = () => reject(new Error("Failed to read converted HEIC image"));
+        reader.onerror = () =>
+          reject(new Error("Failed to read converted HEIC image"));
         reader.readAsDataURL(jpegBlob);
       });
     }
@@ -2066,6 +2188,16 @@ function downloadFile(urlOrBlob, filename) {
   }
 
   // Mobile support is now fully enabled and optimized.
+
+  // Warm the HEIC engine on dedicated converter pages so conversion starts instantly.
+  (function preloadHeicEngine() {
+    try {
+      const page = (location.pathname.split("/").pop() || "").toLowerCase();
+      if (/^hei[cf]-to-/.test(page)) {
+        loadScriptOnce(SCRIPT_LIBS.heicTo).catch(function () {});
+      }
+    } catch (_) {}
+  })();
 
   // Progress Bar Utility
   window.updateProgress = function (percent) {

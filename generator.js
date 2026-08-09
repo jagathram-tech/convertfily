@@ -88,7 +88,6 @@ function getIcon(ext) {
   if (ext === "pdf") return "fa-file-pdf";
   if (ext === "docx") return "fa-file-word";
   if (["xlsx", "xls", "csv", "ods"].includes(ext)) return "fa-file-excel";
-  if (ext === "zip") return "fa-file-archive";
   if (["json", "xml", "html"].includes(ext)) return "fa-file-code";
   return "fa-file-alt";
 }

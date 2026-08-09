@@ -21,7 +21,7 @@ Static HTML site, no build system, no package manager, no tests, no CI, no linti
 ## Sync Rules
 
 - Keep `BASIC_MAPPING` (generator.js:3) and `formatMapping` (main.js:2) in sync. `formatMapping` includes `svg` (hand-managed); `BASIC_MAPPING` does not. When adding formats, update both plus their label tables (`BASIC_LABELS` / `FORMAT_LABELS`).
-- `index.html` contains an **inline** `FORMAT_MAPPING` + `FORMAT_LABELS` + `selectFromFormat` / `selectToFormat` / `filterDropdownItems` in its own `<script>` block. These shadow the versions in `main.js`. The inline mapping is also missing several formats present in `main.js` (`docx`, `xml`, `zip`, `xls`, `ods`). If you change homepage dropdown behavior or add formats, update all three copies.
+- `index.html` contains an **inline** `FORMAT_MAPPING` + `FORMAT_LABELS` + `selectFromFormat` / `selectToFormat` / `filterDropdownItems` in its own `<script>` block. These shadow the versions in `main.js`. If you change homepage dropdown behavior or add formats, update all three copies.
 - FFmpeg.wasm versions: always `ffmpeg@0.12.10` + `util@0.12.1` + `core@0.12.6` in both main.js and hand-crafted video tools.
 - PDF.js: `3.11.174` everywhere. Set `pdfjsLib.GlobalWorkerOptions.workerSrc` explicitly on every page that imports PDF.js.
 

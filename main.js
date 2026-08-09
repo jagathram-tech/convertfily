@@ -23,10 +23,9 @@ const formatMapping = {
   aac: ["mp3", "wav"],
   m4a: ["mp3", "wav"],
   flac: ["mp3", "wav"],
-  xlsx: ["csv", "json", "ods", "pdf"],
+  xlsx: ["csv", "json", "pdf"],
   xls: ["xlsx", "csv", "json", "pdf"],
-  csv: ["xlsx", "json", "ods", "pdf"],
-  ods: ["xlsx", "csv", "json", "pdf"],
+  csv: ["xlsx", "json", "pdf"],
   json: ["xlsx", "csv", "pdf"],
   md: ["html", "pdf", "txt", "docx"],
   html: ["md", "pdf", "txt", "docx"],
@@ -63,7 +62,6 @@ const formatLabels = {
   xls: "Excel (XLS)",
   csv: "CSV Data",
   json: "JSON Data",
-  ods: "ODS Calc",
   md: "Markdown (MD)",
   html: "HTML Page",
   txt: "Plain Text (TXT)",
@@ -406,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const target = (to || "").toLowerCase();
     const needs = new Set();
 
-    const spreadsheet = ["xlsx", "xls", "csv", "ods", "json"];
+    const spreadsheet = ["xlsx", "xls", "csv", "json"];
     const rasterTargets = ["png", "jpg", "jpeg", "webp", "bmp"];
     const mediaTargets = [
       "mp4", "webm", "mov", "avi", "mkv", "mp3", "wav", "ogg", "aac", "m4a", "flac",
@@ -494,11 +492,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // 2. Spreadsheet Conversions using SheetJS (XLSX, CSV, JSON, ODS, XLS)
+      // 2. Spreadsheet Conversions using SheetJS (XLSX, CSV, JSON, XLS)
       if (
-        ["xlsx", "xls", "csv", "ods", "json"].includes(targetFormat) &&
-        (["xlsx", "xls", "csv", "ods", "json"].includes(sourceFormat) ||
-          file.name.match(/\.(xlsx|xls|csv|ods|json)$/i))
+        ["xlsx", "xls", "csv", "json"].includes(targetFormat) &&
+        (["xlsx", "xls", "csv", "json"].includes(sourceFormat) ||
+          file.name.match(/\.(xlsx|xls|csv|json)$/i))
       ) {
         setConversionProgress(18, "Reading spreadsheet data...");
         await convertSpreadsheet(file, targetFormat);
@@ -610,7 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       if (
-        ["xlsx", "xls", "csv", "ods", "json"].includes(sourceFormat) &&
+        ["xlsx", "xls", "csv", "json"].includes(sourceFormat) &&
         targetFormat === "pdf"
       ) {
         setConversionProgress(18, "Building PDF...");

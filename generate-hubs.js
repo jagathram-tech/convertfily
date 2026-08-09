@@ -28,10 +28,9 @@ const BASIC_MAPPING = {
   aac: ["mp3", "wav"],
   m4a: ["mp3", "wav"],
   flac: ["mp3", "wav"],
-  xlsx: ["csv", "json", "ods", "pdf"],
+  xlsx: ["csv", "json", "pdf"],
   xls: ["xlsx", "csv", "json", "pdf"],
-  csv: ["xlsx", "json", "ods", "pdf"],
-  ods: ["xlsx", "csv", "json", "pdf"],
+  csv: ["xlsx", "json", "pdf"],
   json: ["xlsx", "csv", "pdf"],
   md: ["html", "pdf", "txt", "docx"],
   html: ["md", "pdf", "txt", "docx"],
@@ -46,7 +45,7 @@ const MEDIA = new Set([
   "mp3", "wav", "ogg", "aac", "m4a", "flac",
 ]);
 const DOCUMENT = new Set([
-  "docx", "xlsx", "xls", "csv", "ods", "json", "md", "html", "txt", "xml",
+  "docx", "xlsx", "xls", "csv", "json", "md", "html", "txt", "xml",
 ]);
 
 const HUBS = [

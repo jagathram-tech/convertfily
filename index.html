@@ -415,7 +415,6 @@
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="docx" onclick="selectFromFormat('docx','Word (DOCX)')">Word (DOCX)</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="xlsx" onclick="selectFromFormat('xlsx','Excel')">Excel (XLSX)</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="xls" onclick="selectFromFormat('xls','Excel (XLS)')">Excel (XLS)</div>
-                                    <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="ods" onclick="selectFromFormat('ods','ODS Calc')">ODS Calc</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="csv" onclick="selectFromFormat('csv','CSV')">CSV Data</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="json" onclick="selectFromFormat('json','JSON Data')">JSON Data</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="xml" onclick="selectFromFormat('xml','XML Data')">XML Data</div>
@@ -543,10 +542,9 @@
                 'aac': ['mp3','wav'],
                 'm4a': ['mp3','wav'],
                 'flac': ['mp3','wav'],
-                'xlsx': ['csv','json','ods','pdf'],
+                'xlsx': ['csv','json','pdf'],
                 'xls': ['xlsx','csv','json','pdf'],
-                'csv': ['xlsx','json','ods','pdf'],
-                'ods': ['xlsx','csv','json','pdf'],
+                'csv': ['xlsx','json','pdf'],
                 'json': ['xlsx','csv','pdf'],
                 'md': ['html','pdf','txt','docx'],
                 'html': ['md','pdf','txt','docx'],
@@ -559,7 +557,7 @@
                 'pdf':'PDF Document','mp4':'MP4 Video','webm':'WebM Video','mov':'MOV Video','avi':'AVI Video','mkv':'MKV Video',
                 'flv':'FLV Video','wmv':'WMV Video','mp3':'MP3 Audio','wav':'WAV Audio','ogg':'OGG Audio','aac':'AAC Audio',
                 'm4a':'M4A Audio','flac':'FLAC Audio','xlsx':'Excel (XLSX)','xls':'Excel (XLS)','csv':'CSV Data','json':'JSON Data',
-                'ods':'ODS Calc','md':'Markdown (MD)','html':'HTML Page','txt':'Plain Text (TXT)','xml':'XML Data',
+                'md':'Markdown (MD)','html':'HTML Page','txt':'Plain Text (TXT)','xml':'XML Data',
                 'docx':'Word Document (DOCX)'
             };
 

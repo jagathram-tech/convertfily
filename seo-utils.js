@@ -46,7 +46,6 @@ const BASIC_LABELS = {
   xls: "Excel Spreadsheet (XLS)",
   csv: "CSV Spreadsheet",
   json: "JSON Data File",
-  ods: "ODS Spreadsheet",
   md: "Markdown Document",
   html: "HTML Document",
   txt: "Plain Text File",

@@ -54,7 +54,7 @@ Font Awesome 6.4.0 (cdnjs) · Inter wght@400-800 (Google Fonts) · SheetJS 0.20.
 
 Add `gtag.js` (ID: `G-4Z6LTJ67E2`) **only** on hand-crafted tool pages with substantial custom logic. **Never** add to `index.html` or auto-generated converters.
 
-Currently on: merge-pdf, compress-pdf, watermark, pdf-to-word, ocr, image-tools, qr-code-generator, file-hash-checker, image-to-json, image-to-base64, exif-reader, metadata-stripper, color-palette-extractor, eyedropper, pixel-art, stereogram, steganography, brightness-map, collage-maker, string-art, nasa-earth-imagery, nasa-apod.
+Currently on: merge-pdf, compress-pdf, watermark, pdf-to-word, ocr, image-tools, qr-code-generator, file-hash-checker, image-to-json, image-to-base64, exif-reader, metadata-stripper, color-palette-extractor, eyedropper, pixel-art, stereogram, steganography, brightness-map, collage-maker, nasa-earth-imagery, nasa-apod.
 
 ## Homepage Dropzone
 

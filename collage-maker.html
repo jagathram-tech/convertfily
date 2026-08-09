@@ -45,64 +45,299 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=2.1.2">
     <style>
-        .tool-container { max-width: 56.25rem; margin: 0 auto; padding: 1.5rem; }
-
-        .collage-layout { display: grid; grid-template-columns: 350px 1fr; gap: 2rem; margin-top: 2rem; }
-
-        .controls-pane {
-            background: white; padding: 1.875rem; border-radius: 1.25rem; border: 1px solid var(--border);
-            display: flex; flex-direction: column; gap: 2rem; align-self: start;
-            max-height: 80vh; overflow-y: auto;
+        /* Single-viewport collage workspace — no page scroll, no options scrollbar */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        body.elevra-theme > .elevra-workspace {
+            height: 100dvh;
+            max-height: 100dvh;
+            gap: 0.35rem !important;
+            padding: 0.4rem 0.75rem 0.4rem;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        body.elevra-theme > .elevra-workspace > nav {
+            flex-shrink: 0;
+        }
+        body.elevra-theme > .elevra-workspace > footer {
+            display: none; /* keep tool fully on one screen */
+        }
+        main {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .layout-toggle { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        .tool-container {
+            flex: 1 1 auto;
+            min-height: 0;
+            max-width: none;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 0 0 0.4rem !important;
+            flex-shrink: 0;
+            line-height: 1.2;
+        }
+        .section-title i {
+            font-size: 1.15rem !important;
+            margin-bottom: 0.15rem;
+            display: inline-block;
+        }
+        .section-title h1 {
+            font-size: 1.2rem;
+            margin: 0.1rem 0;
+            font-weight: 800;
+        }
+        .section-title p {
+            font-size: 0.78rem;
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        .collage-layout {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: minmax(220px, 260px) 1fr;
+            gap: 0.65rem;
+            margin-top: 0;
+            overflow: hidden;
+        }
+
+        .controls-pane {
+            background: white;
+            padding: 0.65rem 0.75rem;
+            border-radius: 0.85rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            align-self: stretch;
+            min-height: 0;
+            max-height: none;
+            overflow: hidden; /* no dedicated options scrollbar */
+        }
+        .controls-pane > hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 0.15rem 0 !important;
+            flex-shrink: 0;
+        }
+
+        .layout-toggle {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 0;
+        }
         .layout-toggle .tab-btn {
-            flex: 1; max-width: 12.5rem; padding: 0.75rem 1.5rem; border-radius: 3.125rem; font-weight: 600;
-            cursor: pointer; border: none; background: #e2e8f0; color: var(--text-muted);
-            transition: 0.2s; text-align: center;
+            flex: 1;
+            max-width: none;
+            padding: 0.4rem 0.45rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.72rem;
+            cursor: pointer;
+            border: none;
+            background: #e2e8f0;
+            color: var(--text-muted);
+            transition: 0.15s;
+            text-align: center;
+            line-height: 1.2;
         }
         .layout-toggle .tab-btn.active { background: var(--primary); color: white; }
 
-        #gridSettings { display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap; justify-content: center; }
-        #gridSettings .control-group { display: flex; flex-direction: column; gap: 0.5rem; flex: 1; min-width: 9.375rem; }
+        #gridSettings {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        #gridSettings .control-group {
+            min-width: 0;
+            flex: none;
+        }
 
         .upload-area {
-            border: 2px dashed #cbd5e1; border-radius: 0.75rem; padding: 1.25rem; text-align: center;
-            cursor: pointer; transition: 0.2s; background: #f8fafc;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 0.6rem;
+            padding: 0.55rem 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.15s;
+            background: #f8fafc;
         }
-        .upload-area:hover { border-color: var(--primary); background: #f0fdf4; }
-        
-        .thumbnail-strip { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
-        .thumbnail { width: 3.75rem; height: 3.75rem; object-fit: cover; border-radius: 0.375rem; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
-        
-        .control-group { display: flex; flex-direction: column; gap: 0.625rem; }
-        .control-header { display: flex; justify-content: space-between; align-items: center; }
-        .control-label { font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
-        .control-val { font-size: 0.85rem; color: white; background: var(--primary); padding: 0.1875rem 0.625rem; border-radius: 1.25rem; font-weight: 600; }
-        
-        select, input[type="color"] { width: 100%; padding: 0.625rem; border-radius: 0.5rem; border: 1px solid var(--border); font-family: inherit; font-size: 0.95rem; }
-        input[type="color"] { height: 2.8125rem; cursor: pointer; padding: 0.125rem; }
-        
-        input[type="range"] { -webkit-appearance: none; width: 100%; height: 0.375rem; border-radius: 0.1875rem; background: #e2e8f0; outline: none; margin: 0.625rem 0; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; height: 1.25rem; width: 1.25rem; border-radius: 50%; background: var(--primary); cursor: pointer; transition: transform 0.1s; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3); }
-        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+        .upload-area:hover { border-color: var(--primary); background: #eff6ff; }
+        .upload-area i { font-size: 1.15rem !important; margin-bottom: 0.2rem !important; }
+        .upload-area h4 { margin: 0; font-size: 0.82rem; font-weight: 700; }
+        .upload-area p { margin: 0.1rem 0 0 !important; font-size: 0.7rem !important; }
 
-        .btn-action { padding: 0.9375rem; background: var(--primary); color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 1rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.625rem; }
-        .btn-action:hover { opacity: 0.9; transform: translateY(-2px); }
+        .thumbnail-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.35rem;
+            max-height: 4.5rem;
+            overflow: hidden;
+            align-content: flex-start;
+        }
+        .thumbnail {
+            width: 2.1rem;
+            height: 2.1rem;
+            object-fit: cover;
+            border-radius: 0.3rem;
+            border: 1.5px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 0.2rem; flex-shrink: 0; }
+        .control-header { display: flex; justify-content: space-between; align-items: center; }
+        .control-label { font-weight: 600; color: var(--text-main); font-size: 0.78rem; }
+        .control-val {
+            font-size: 0.68rem;
+            color: white;
+            background: var(--primary);
+            padding: 0.1rem 0.4rem;
+            border-radius: 999px;
+            font-weight: 600;
+        }
+
+        select, input[type="color"] {
+            width: 100%;
+            padding: 0.3rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            font-size: 0.8rem;
+        }
+        input[type="color"] {
+            width: 2.5rem;
+            height: 1.75rem;
+            cursor: pointer;
+            padding: 0.1rem;
+            flex-shrink: 0;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 0.3rem;
+            border-radius: 0.15rem;
+            background: #e2e8f0;
+            outline: none;
+            margin: 0.2rem 0 0.1rem;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 0.95rem;
+            width: 0.95rem;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-action {
+            padding: 0.5rem 0.65rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.45rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+            font-size: 0.8rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            flex-shrink: 0;
+        }
+        .btn-action:hover { opacity: 0.92; }
         .btn-secondary { background: var(--bg-alt); color: var(--primary); border: 1px solid var(--primary); }
-        .btn-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
-        .btn-danger { background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; padding: 0.5rem; font-size: 0.85rem; margin-top: 0.625rem; }
-        .btn-danger:hover { background: #ef4444; color: white; transform: translateY(-2px); }
+        .btn-secondary:hover { background: var(--primary); color: white; }
+        .btn-danger {
+            background: #fee2e2;
+            color: #ef4444;
+            border: 1px solid #fca5a5;
+            padding: 0.35rem 0.5rem;
+            font-size: 0.72rem;
+            margin-top: 0.25rem;
+        }
+        .btn-danger:hover { background: #ef4444; color: white; }
+
+        #btnDownload {
+            margin: 0.15rem 0 0 !important;
+            max-width: none !important;
+        }
 
         .preview-pane {
-            background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 1.25rem;
-            display: flex; align-items: center; justify-content: center; min-height: 37.5rem;
-            padding: 1.25rem; text-align: center; flex-direction: column; gap: 1.25rem; overflow: hidden;
+            background: #f8fafc;
+            border: 1.5px dashed #e2e8f0;
+            border-radius: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+            height: 100%;
+            padding: 0.65rem;
+            text-align: center;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow: hidden;
         }
-        #collageCanvas { max-width: 100%; max-height: 75vh; border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: none; }
+        #placeholderText i { font-size: 2rem !important; margin-bottom: 0.35rem !important; }
+        #placeholderText h3 { font-size: 0.95rem; margin: 0.2rem 0; }
+        #placeholderText p { font-size: 0.78rem; margin: 0; }
+        #collageCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 0.4rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            display: none;
+        }
+
+        #scatterSettings p { font-size: 0.72rem !important; margin: 0 0 0.25rem; }
 
         @media (max-width: 56.25rem) {
-            .collage-layout { grid-template-columns: 1fr; }
+            html, body { height: auto; overflow: auto; }
+            body.elevra-theme > .elevra-workspace {
+                height: auto;
+                max-height: none;
+                overflow: visible;
+                gap: 0.75rem !important;
+            }
+            body.elevra-theme > .elevra-workspace > footer { display: block; }
+            main, .tool-container { overflow: visible; min-height: auto; }
+            .collage-layout {
+                grid-template-columns: 1fr;
+                overflow: visible;
+                min-height: auto;
+            }
+            .controls-pane {
+                overflow: visible;
+                max-height: none;
+            }
+            .preview-pane {
+                min-height: 16rem;
+                height: auto;
+            }
             #collageCanvas { max-height: 50vh; }
         }
     </style>
@@ -266,36 +501,33 @@
 
     <main>
         <div class="tool-container">
-            <div class="section-title" style="text-align: center; margin-bottom: 2rem;">
-                <i class="fas fa-th-large" style="color: var(--primary); font-size: 2rem;"></i>
+            <div class="section-title">
+                <i class="fas fa-th-large" style="color: var(--primary);"></i>
                 <h1>Photo Collage Maker</h1>
-                <p style="color: var(--text-muted);">Arrange your photos into beautiful grids or scattered polaroid freeform layouts instantly.</p>
+                <p>Grid or polaroid layouts — private, in your browser.</p>
             </div>
 
             <div class="collage-layout">
                 <div class="controls-pane">
-                    
                     <div class="control-group">
                         <span class="control-label"><i class="fas fa-images"></i> 1. Add Photos</span>
                         <div class="upload-area" id="dropzone" onclick="document.getElementById('fileInput').click()">
-                            <i class="fas fa-plus-circle" style="font-size: 2rem; color: #94a3b8; margin-bottom: 10px;"></i>
-                            <h4>Click or Drag Photos Here</h4>
-                            <p style="margin:0; font-size: 0.85rem; color: var(--text-muted);">Select multiple images</p>
+                            <i class="fas fa-plus-circle" style="color: #94a3b8;"></i>
+                            <h4>Click or drag photos</h4>
+                            <p style="color: var(--text-muted);">Multiple images OK</p>
                             <input type="file" id="fileInput" hidden accept="image/*" multiple>
                         </div>
                         <div class="thumbnail-strip" id="thumbnailStrip"></div>
-                        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
-                            <button class="btn-action btn-danger" id="btnClear" style="display:none;" onclick="clearPhotos()"><i class="fas fa-trash-alt"></i> Clear All Photos</button>
-                        </div>
+                        <button class="btn-action btn-danger" id="btnClear" style="display:none;" onclick="clearPhotos()"><i class="fas fa-trash-alt"></i> Clear All</button>
                     </div>
 
-                    <hr style="border:0; border-top: 1px solid var(--border); margin: 2rem 0;">
+                    <hr>
 
                     <div class="control-group">
-                        <span class="control-label"><i class="fas fa-layer-group"></i> 2. Layout Style</span>
+                        <span class="control-label"><i class="fas fa-layer-group"></i> 2. Layout</span>
                         <div class="layout-toggle">
-                            <button class="tab-btn active" onclick="setLayoutMode('grid', this)">Grid (Square Cells)</button>
-                            <button class="tab-btn" onclick="setLayoutMode('scatter', this)">Polaroid Scatter (Freeform)</button>
+                            <button class="tab-btn active" onclick="setLayoutMode('grid', this)">Grid</button>
+                            <button class="tab-btn" onclick="setLayoutMode('scatter', this)">Polaroid</button>
                         </div>
                     </div>
 
@@ -305,39 +537,39 @@
                             <input type="range" id="gridCols" min="1" max="8" value="3" oninput="updateVal('gridCols', 'valCols'); drawCollage();">
                         </div>
                         <div class="control-group">
-                            <div class="control-header"><span class="control-label">Spacing Gap</span><span class="control-val" id="valGap">20px</span></div>
+                            <div class="control-header"><span class="control-label">Gap</span><span class="control-val" id="valGap">20px</span></div>
                             <input type="range" id="gridGap" min="0" max="100" value="20" oninput="updateVal('gridGap', 'valGap', 'px'); drawCollage();">
                         </div>
                         <div class="control-group">
-                            <div class="control-header"><span class="control-label">Corner Radius</span><span class="control-val" id="valRadius">10px</span></div>
+                            <div class="control-header"><span class="control-label">Radius</span><span class="control-val" id="valRadius">10px</span></div>
                             <input type="range" id="gridRadius" min="0" max="150" value="10" oninput="updateVal('gridRadius', 'valRadius', 'px'); drawCollage();">
                         </div>
                     </div>
 
-                    <div id="scatterSettings" style="display: none; flex-direction: column; gap: 15px;">
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">Photos are scattered like polaroids on a desk.</p>
-                        <button class="btn-action btn-secondary" onclick="shuffleScatter()"><i class="fas fa-random"></i> Shuffle Arrangement</button>
+                    <div id="scatterSettings" style="display: none; flex-direction: column; gap: 0.35rem;">
+                        <p style="color: var(--text-muted);">Scattered polaroids on a desk.</p>
+                        <button class="btn-action btn-secondary" onclick="shuffleScatter()"><i class="fas fa-random"></i> Shuffle</button>
                     </div>
 
-                    <hr style="border:0; border-top: 1px solid var(--border); margin: 2rem 0;">
+                    <hr>
 
                     <div class="control-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
-                            <span class="control-label"><i class="fas fa-fill-drip"></i> 3. Background Color</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+                            <span class="control-label"><i class="fas fa-fill-drip"></i> 3. Background</span>
                             <input type="color" id="bgColor" value="#ffffff" oninput="drawCollage()">
                         </div>
                     </div>
 
-                    <button class="btn-action" id="btnDownload" onclick="downloadCollage()" style="display:none; margin:1.5rem auto 0; max-width:300px;">
-                        <i class="fas fa-download"></i> Download Collage
+                    <button class="btn-action" id="btnDownload" onclick="downloadCollage()" style="display:none;">
+                        <i class="fas fa-download"></i> Download
                     </button>
                 </div>
                 
                 <div class="preview-pane">
                     <div id="placeholderText">
-                        <i class="fas fa-th" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+                        <i class="fas fa-th" style="color: #cbd5e1;"></i>
                         <h3 style="color: var(--text-muted);">Your collage will appear here</h3>
-                        <p style="color: #94a3b8; font-size: 0.9rem;">Upload some photos to get started.</p>
+                        <p style="color: #94a3b8;">Upload photos to get started.</p>
                     </div>
                     <canvas id="collageCanvas"></canvas>
                 </div>

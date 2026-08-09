@@ -1524,92 +1524,55 @@ document.addEventListener("DOMContentLoaded", () => {
       const { FFmpeg } = window.FFmpegWASM;
       const { toBlobURL } = window.FFmpegUtil;
 
-      // Multiple load strategies — "failed to import ffmpeg-core.js" is common
-      // when blob/worker/CDN paths disagree. Try safest combos first.
+      // CRITICAL: classWorkerURL MUST be a same-origin blob URL.
+      // If omitted, UMD FFmpeg tries:
+      //   new Worker("https://cdn.../814.ffmpeg.js")
+      // which browsers block cross-origin from covertfily.com
+      // ("Script cannot be accessed from origin ...").
+      const workerCandidates = [
+        "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js",
+        "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js",
+      ];
+
+      async function blobWorkerURL() {
+        let last;
+        for (const url of workerCandidates) {
+          try {
+            return await toBlobURL(url, "text/javascript");
+          } catch (err) {
+            last = err;
+          }
+        }
+        throw last || new Error("Could not fetch FFmpeg worker script");
+      }
+
+      // All strategies use blob URLs for core + worker (same-origin).
       const strategies = [
         {
-          name: "jsdelivr-esm-blob",
-          run: async (ff) => {
-            const base =
-              "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
-            await ff.load({
-              coreURL: await toBlobURL(
-                `${base}/ffmpeg-core.js`,
-                "text/javascript",
-              ),
-              wasmURL: await toBlobURL(
-                `${base}/ffmpeg-core.wasm`,
-                "application/wasm",
-              ),
-            });
-          },
+          name: "jsdelivr-esm-core",
+          coreBase:
+            "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm",
         },
         {
-          name: "jsdelivr-umd-blob",
-          run: async (ff) => {
-            const base =
-              "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd";
-            await ff.load({
-              coreURL: await toBlobURL(
-                `${base}/ffmpeg-core.js`,
-                "text/javascript",
-              ),
-              wasmURL: await toBlobURL(
-                `${base}/ffmpeg-core.wasm`,
-                "application/wasm",
-              ),
-            });
-          },
+          name: "jsdelivr-umd-core",
+          coreBase:
+            "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd",
         },
         {
-          name: "jsdelivr-umd-direct",
-          run: async (ff) => {
-            // Direct CDN URLs (no blob) — works when CORS allows worker import
-            const base =
-              "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd";
-            await ff.load({
-              coreURL: `${base}/ffmpeg-core.js`,
-              wasmURL: `${base}/ffmpeg-core.wasm`,
-            });
-          },
+          name: "unpkg-esm-core",
+          coreBase: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm",
         },
         {
-          name: "unpkg-umd-blob-worker",
-          run: async (ff) => {
-            const coreBase =
-              "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
-            const workerURL =
-              "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js";
-            await ff.load({
-              coreURL: await toBlobURL(
-                `${coreBase}/ffmpeg-core.js`,
-                "text/javascript",
-              ),
-              wasmURL: await toBlobURL(
-                `${coreBase}/ffmpeg-core.wasm`,
-                "application/wasm",
-              ),
-              classWorkerURL: await toBlobURL(workerURL, "text/javascript"),
-            });
-          },
-        },
-        {
-          name: "unpkg-esm-blob",
-          run: async (ff) => {
-            const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
-            await ff.load({
-              coreURL: await toBlobURL(
-                `${base}/ffmpeg-core.js`,
-                "text/javascript",
-              ),
-              wasmURL: await toBlobURL(
-                `${base}/ffmpeg-core.wasm`,
-                "application/wasm",
-              ),
-            });
-          },
+          name: "unpkg-umd-core",
+          coreBase: "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd",
         },
       ];
+
+      // Create worker blob once and reuse
+      if (loadingText) {
+        loadingText.textContent = "Loading Media Engine (worker)...";
+      }
+      const classWorkerURL = await blobWorkerURL();
 
       let lastErr = null;
       for (const strategy of strategies) {
@@ -1619,11 +1582,27 @@ document.addEventListener("DOMContentLoaded", () => {
               "Loading Media Engine (" + strategy.name + ")...";
           }
           console.log("[ffmpeg] trying load strategy:", strategy.name);
+
+          const coreURL = await toBlobURL(
+            `${strategy.coreBase}/ffmpeg-core.js`,
+            "text/javascript",
+          );
+          const wasmURL = await toBlobURL(
+            `${strategy.coreBase}/ffmpeg-core.wasm`,
+            "application/wasm",
+          );
+
           const instance = new FFmpeg();
           instance.on("log", ({ message }) => {
             console.log("[ffmpeg]", message);
           });
-          await strategy.run(instance);
+
+          await instance.load({
+            coreURL,
+            wasmURL,
+            classWorkerURL,
+          });
+
           // Only cache after a successful load
           ffmpeg = instance;
           console.log("[ffmpeg] loaded via", strategy.name);

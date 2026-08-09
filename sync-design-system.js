@@ -48,10 +48,15 @@ const htmlFiles = files.filter(file => {
   if (file === "index.html") return false;
   if (file === "png-to-jpg.html") return false;
   
-  // Skip generated converter files: pattern from-to-to.html
-  // except pdf-to-word.html which is hand-crafted.
-  if (file === "pdf-to-word.html") return true;
-  
+  // Skip generated converter files: pattern from-to.html
+  // except hand-crafted tools that use an x-to-y filename.
+  const handCraftedXtoY = new Set([
+    "pdf-to-word.html",
+    "image-to-json.html",
+    "image-to-base64.html",
+  ]);
+  if (handCraftedXtoY.has(file)) return true;
+
   const isConverterPattern = /^[a-z0-9]+-to-[a-z0-9]+\.html$/.test(file);
   return !isConverterPattern;
 });

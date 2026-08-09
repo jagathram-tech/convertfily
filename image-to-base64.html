@@ -41,7 +41,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
@@ -173,73 +173,148 @@
         }
         #loadingBar { height: 100%; background: var(--primary); transition: width 0.3s; width: 0%; }
     </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-                    <nav>
-    <div class="nav-inner">
-        <div class="nav-left">
-            <div class="logo"><a href="index.html"><img src="logo.png" alt="Covertfily"></a></div>
-        </div>
-        <div class="nav-right">
-            <a href="index.html">Home</a>
-            <button class="nav-tools-btn" id="navToolsBtn" type="button">Tools <span class="nav-caret">▾</span></button>
-            <div class="nav-tools-dropdown" id="navToolsDropdown">
-                <input type="text" class="tools-dropdown-search" id="navToolsDropdownSearch" placeholder="Search tools...">
-                <div class="tools-dropdown-scroll">
-                    <div class="tools-group">
-                        <div class="tools-group-label">PDF Tools</div>
-                        <a href="merge-pdf.html">Merge PDF</a>
-                        <a href="compress-pdf.html">Compress PDF</a>
-                        <a href="reorder-pdf.html">Reorder PDF Pages</a>
-                        <a href="protect-pdf.html">Protect/Unlock PDF</a>
-                        <a href="watermark.html">Watermark</a>
+<body class="elevra-theme">
+        <div class="elevra-workspace w-full flex flex-col gap-16 relative overflow-hidden">
+                    <nav class="flex items-center justify-between w-full relative z-50">
+                <a href="index.html" class="cf-brand" aria-label="Covertfily home">
+                    <img src="logo.png" alt="Covertfily" class="cf-logo" />
+                </a>
+
+                <div class="cf-nav-center">
+                    <a href="index.html" class="cf-nav-link">Home</a>
+                    <button class="cf-nav-link" id="navToolsBtn" type="button">
+                        Tools <i class="fas fa-chevron-down text-[10px] opacity-60 transition-transform duration-200" id="navToolsCaret"></i>
+                    </button>
+                    <a href="blog.html" class="cf-nav-link">Blog</a>
+                    <a href="documentation.html" class="cf-nav-link">Docs</a>
+                </div>
+
+                <div class="cf-nav-actions">
+                    <a href="index.html#tools-dashboard" class="cf-btn-ghost">Tools</a>
+                    <a href="index.html#convert" class="cf-btn-primary">Convert</a>
+                </div>
+
+                <button id="mobileMenuToggle" class="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg text-slate-800 active:scale-95 transition-all duration-200" type="button" aria-label="Toggle mobile menu">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+
+                <!-- Mobile Menu Drawer Backdrop -->
+                <div id="mobileMenuBackdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden"></div>
+
+                <!-- Mobile Menu Drawer -->
+                <div id="mobileMenuDrawer" class="fixed top-0 right-0 h-full w-[280px] bg-white/95 backdrop-blur-[35px] border-l border-white/40 shadow-2xl z-[101] translate-x-full pointer-events-none transition-transform duration-300 lg:hidden flex flex-col">
+                    <!-- Drawer Header -->
+                    <div class="flex items-center justify-between p-5 border-b border-slate-100">
+                        <img src="logo.png" alt="Covertfily" class="cf-logo cf-logo--drawer" />
+                        <button id="mobileMenuClose" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-all duration-300" type="button" aria-label="Close mobile menu">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-                    <div class="tools-group">
-                        <div class="tools-group-label">Image Tools</div>
-                        <a href="image-resizer.html">Image Resizer</a>
-                        <a href="image-rounder.html">Image Rounder</a>
-                        <a href="image-blur.html">Image Blur</a>
-<a href="color-palette-extractor.html">Color Palette</a>
-                        <a href="eyedropper.html">EyeDropper</a>
-                        <a href="image-to-base64.html">Image to Base64</a>
-                        <a href="exif-reader.html">EXIF Reader</a>
-                        <a href="metadata-stripper.html">Metadata Stripper</a>
-                        <a href="pixel-art.html">Pixel Art</a>
-                        <a href="image-to-json.html">Image to JSON</a>
-                        <a href="brightness-map.html">Brightness Map</a>
-                        <a href="stereogram.html">Stereogram</a>
-                        <a href="steganography.html">Steganography</a>
-                        <a href="collage-maker.html">Collage Maker</a>
-                        <a href="ocr.html">Image to Text (OCR)</a>
-</div>
-                    <div class="tools-group">
-                        <div class="tools-group-label">Video Tools</div>
-                        <a href="video-trimmer.html">Video Trimmer</a>
-                        <a href="video-frame-extractor.html">Frame Extractor</a>
-                        <a href="video-compressor.html">Video Compressor</a>
-                        <a href="video-speed.html">Video Speed Changer</a>
-                    </div>
-                    <div class="tools-group">
-                        <div class="tools-group-label">Audio Tools</div>
-                        <a href="audio-trimmer.html">Audio Trimmer</a>
-                        <a href="audio-merger.html">Audio Merger</a>
-                    </div>
-                    <div class="tools-group">
-                        <div class="tools-group-label">Generate</div>
-                        <a href="qr-code-generator.html">QR Code Generator</a>
-                        <a href="barcode-generator.html">Barcode Generator</a>
-                        <a href="lorem-ipsum.html">Lorem Ipsum Generator</a>
-                        <a href="word-counter.html">Word & Character Counter</a>
-                    </div>
-                    <div class="tools-group">
-                        <div class="tools-group-label">Utilities</div>
-                        <a href="file-hash-checker.html">File Hash Checker</a>
+
+                    <!-- Drawer Content -->
+                    <div class="flex-1 overflow-y-auto p-5 space-y-6">
+                        <!-- Navigation Links -->
+                        <div class="flex flex-col gap-3">
+                            <a href="index.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[15px] font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300">
+                                <i class="fas fa-home w-5 text-slate-400"></i> Home
+                            </a>
+                            <a href="blog.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[15px] font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300">
+                                <i class="fas fa-newspaper w-5 text-slate-400"></i> Blog
+                            </a>
+                            <a href="documentation.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[15px] font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100/50 transition-all duration-300">
+                                <i class="fas fa-file-alt w-5 text-slate-400"></i> Docs
+                            </a>
+                        </div>
+
+                        <hr class="border-slate-100">
+
+                        <!-- CTAs inside Drawer -->
+                        <div class="flex flex-col gap-2">
+                            <a href="index.html#tools-dashboard" class="flex items-center justify-center bg-white border border-slate-200 text-slate-800 text-[14px] font-extrabold py-3 rounded-xl shadow-sm hover:bg-slate-50 active:scale-98 transition-all duration-300">
+                                Tools Dashboard
+                            </a>
+                            <a href="index.html#convert" class="flex items-center justify-center bg-blue-600 text-white text-[14px] font-extrabold py-3 rounded-xl shadow-md hover:bg-blue-700 active:scale-98 transition-all duration-300">
+                                Convert Files
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</nav>
+
+
+                <!-- Dynamic Glass Tools Dropdown -->
+                <div class="nav-tools-dropdown absolute top-full left-1/2 -translate-x-1/2 mt-4 w-[640px] max-w-[90vw] z-50 bg-white/75 backdrop-blur-[35px] border border-white/60 rounded-[32px] p-6 shadow-2xl opacity-0 invisible pointer-events-none transition-all duration-300" id="navToolsDropdown">
+                    <!-- Dropdown Search -->
+                    <div class="relative mb-6">
+                        <input type="text" class="w-full bg-white/50 border border-white/60 rounded-2xl px-4 py-3 pl-11 text-[14px] font-semibold text-slate-800 placeholder-slate-400 outline-none focus:border-blue-500 focus:bg-white/80 transition-all shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]" id="navToolsDropdownSearch" placeholder="Search tools...">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    </div>
+                    <!-- Tools Categories Scroll -->
+                    <div class="tools-dropdown-scroll grid grid-cols-2 gap-6 max-h-[360px] overflow-y-auto pr-2" id="navToolsList">
+                        <div class="tools-group">
+                            <div class="tools-group-label text-[12px] font-extrabold text-blue-600 uppercase tracking-widest mb-3">PDF Tools</div>
+                            <div class="flex flex-col gap-2">
+                                <a href="merge-pdf.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Merge PDF</a>
+                                <a href="compress-pdf.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Compress PDF</a>
+                                <a href="reorder-pdf.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Reorder PDF Pages</a>
+                                <a href="protect-pdf.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Protect/Unlock PDF</a>
+                                <a href="watermark.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Watermark</a>
+                            </div>
+                        </div>
+                        <div class="tools-group">
+                            <div class="tools-group-label text-[12px] font-extrabold text-blue-600 uppercase tracking-widest mb-3">Image Tools</div>
+                            <div class="flex flex-col gap-2">
+                                <a href="image-resizer.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Image Resizer</a>
+                                <a href="image-rounder.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Image Rounder</a>
+                                <a href="image-blur.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Image Blur</a>
+                                <a href="color-palette-extractor.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Color Palette</a>
+                                <a href="eyedropper.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">EyeDropper</a>
+                                <a href="image-to-base64.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Image to Base64</a>
+                                <a href="exif-reader.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">EXIF Reader</a>
+                                <a href="metadata-stripper.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Metadata Stripper</a>
+                                <a href="pixel-art.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Pixel Art</a>
+                                <a href="image-to-json.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Image to JSON</a>
+                                <a href="brightness-map.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Brightness Map</a>
+                                <a href="stereogram.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Stereogram</a>
+                                <a href="steganography.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Steganography</a>
+                                <a href="collage-maker.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Collage Maker</a>
+                                <a href="ocr.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Image to Text (OCR)</a>
+                            </div>
+                        </div>
+                        <div class="tools-group">
+                            <div class="tools-group-label text-[12px] font-extrabold text-blue-600 uppercase tracking-widest mb-3">Video & Audio</div>
+                            <div class="flex flex-col gap-2">
+                                <a href="video-trimmer.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Video Trimmer</a>
+                                <a href="video-frame-extractor.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Frame Extractor</a>
+                                <a href="video-compressor.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Video Compressor</a>
+                                <a href="video-speed.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Video Speed</a>
+                                <a href="audio-trimmer.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Audio Trimmer</a>
+                                <a href="audio-merger.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Audio Merger</a>
+                            </div>
+                        </div>
+                        <div class="tools-group">
+                            <div class="tools-group-label text-[12px] font-extrabold text-blue-600 uppercase tracking-widest mb-3">Utilities & Generators</div>
+                            <div class="flex flex-col gap-2">
+                                <a href="qr-code-generator.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">QR Code Generator</a>
+                                <a href="barcode-generator.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Barcode Generator</a>
+                                <a href="lorem-ipsum.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Lorem Ipsum</a>
+                                <a href="word-counter.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Word Counter</a>
+                                <a href="file-hash-checker.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">File Hash Checker</a>
+                                <a href="nasa-earth-imagery.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">Earth Satellite Imagery</a>
+                                <a href="nasa-apod.html" class="text-[14px] font-semibold text-slate-700 hover:text-slate-900 transition-colors">NASA APOD Downloader</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
 
     <main>
         <div class="tool-container">
@@ -319,48 +394,58 @@
     </div>
 
                     <footer>
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <div class="logo"><img src="logo.png" alt="Covertfily"></div>
-                <p>100% private, browser-based file conversion. No uploads. No tracking. Open source.</p>
-            </div>
-            <div class="footer-col">
-                                <h4>Product</h4>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="merge-pdf.html">PDF Tools</a></li>
-                    <li><a href="image-resizer.html">Image Tools</a></li>
-                    <li><a href="video-trimmer.html">Video Tools</a></li>
-                    <li><a href="audio-trimmer.html">Audio Tools</a></li>
-                    <li><a href="qr-code-generator.html">Generators</a></li>
-                    <li><a href="file-hash-checker.html">Utilities</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Resources</h4>
-                <ul>
-                    <li><a href="https://github.com/jagathram-tech/covertfily">GitHub</a></li>
-                    <li><a href="documentation.html">Documentation</a></li>
-                    <li><a href="index.html#faq">FAQ</a></li>
-                </ul>
-            </div>
-            <div class="footer-col">
-                <h4>Legal</h4>
-                <ul>
-                    <li><a href="privacy.html">Privacy Policy</a></li>
-                    <li><a href="terms.html">Terms of Use</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Covertfily. MIT Licensed.</p>
-            <div class="footer-social">
-                <a href="https://github.com/jagathram-tech/covertfily"><i class="fab fa-github"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fas fa-envelope"></i></a>
-            </div>
-        </div>
-    </footer>
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <div class="logo">
+                            <img src="logo.png" alt="Covertfily" class="cf-logo cf-logo--footer" />
+                        </div>
+                        <p>
+                            100% private, browser-based file conversion. No uploads.
+                            No tracking. Open source.
+                        </p>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Product</h4>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="pdf-tools.html">PDF Converters</a></li>
+                            <li><a href="image-tools.html">Image Converters</a></li>
+                            <li><a href="document-tools.html">Document Converters</a></li>
+                            <li><a href="media-tools.html">Media Converters</a></li>
+                            <li><a href="merge-pdf.html">PDF Tools</a></li>
+                            <li><a href="image-resizer.html">Image Tools</a></li>
+                            <li><a href="qr-code-generator.html">Generators</a></li>
+                            <li><a href="file-hash-checker.html">Utilities</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Resources</h4>
+                        <ul>
+                            <li>
+                                <a href="https://github.com/jagathram-tech/covertfily">GitHub</a>
+                            </li>
+                            <li><a href="documentation.html">Documentation</a></li>
+                            <li><a href="index.html#faq">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Legal</h4>
+                        <ul>
+                            <li><a href="privacy.html">Privacy Policy</a></li>
+                            <li><a href="terms.html">Terms of Use</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Covertfily. MIT Licensed.</p>
+                    <div class="footer-social">
+                        <a href="https://github.com/jagathram-tech/covertfily"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </footer>
+        </div> <!-- Close .elevra-workspace -->
 
     <script>
         const fileInput = document.getElementById('fileInput');

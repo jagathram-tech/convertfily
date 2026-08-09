@@ -419,7 +419,6 @@
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="csv" onclick="selectFromFormat('csv','CSV')">CSV Data</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="json" onclick="selectFromFormat('json','JSON Data')">JSON Data</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="xml" onclick="selectFromFormat('xml','XML Data')">XML Data</div>
-                                    <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="zip" onclick="selectFromFormat('zip','Archive (ZIP)')">Archive (ZIP)</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="md" onclick="selectFromFormat('md','Markdown')">Markdown (MD)</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="html" onclick="selectFromFormat('html','HTML')">HTML Page</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="txt" onclick="selectFromFormat('txt','Text')">Plain Text (TXT)</div>
@@ -553,8 +552,7 @@
                 'html': ['md','pdf','txt','docx'],
                 'txt': ['pdf','md','html','docx'],
                 'docx': ['pdf','txt','md'],
-                'xml': ['json','txt'],
-                'zip': ['zip']
+                'xml': ['json','txt']
             };
             const FORMAT_LABELS = {
                 'jpg':'JPG/JPEG','png':'PNG','webp':'WebP','bmp':'BMP','gif':'GIF','svg':'SVG','avif':'AVIF','tiff':'TIFF','heic':'HEIC/HEIF',
@@ -562,7 +560,7 @@
                 'flv':'FLV Video','wmv':'WMV Video','mp3':'MP3 Audio','wav':'WAV Audio','ogg':'OGG Audio','aac':'AAC Audio',
                 'm4a':'M4A Audio','flac':'FLAC Audio','xlsx':'Excel (XLSX)','xls':'Excel (XLS)','csv':'CSV Data','json':'JSON Data',
                 'ods':'ODS Calc','md':'Markdown (MD)','html':'HTML Page','txt':'Plain Text (TXT)','xml':'XML Data',
-                'zip':'Archive (ZIP)','docx':'Word Document (DOCX)'
+                'docx':'Word Document (DOCX)'
             };
 
             window.filterDropdownItems = function(input, containerId) {

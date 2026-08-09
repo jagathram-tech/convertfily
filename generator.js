@@ -39,7 +39,6 @@ const BASIC_MAPPING = {
   txt: ["pdf", "md", "html", "docx"],
   docx: ["pdf", "txt", "md"],
   xml: ["json", "txt"],
-  zip: ["zip"],
 };
 
 const IMAGE_FORMATS = new Set([

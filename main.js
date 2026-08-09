@@ -33,7 +33,6 @@ const formatMapping = {
   txt: ["pdf", "md", "html", "docx"],
   docx: ["pdf", "txt", "md"],
   xml: ["json", "txt"],
-  zip: ["zip"],
 };
 
 const formatLabels = {
@@ -69,7 +68,6 @@ const formatLabels = {
   html: "HTML Page",
   txt: "Plain Text (TXT)",
   xml: "XML Data",
-  zip: "Archive (ZIP)",
   docx: "Word Document (DOCX)",
 };
 
@@ -430,7 +428,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (source === "html" && target === "md") needs.add("turndown");
     if (source === "tiff") needs.add("utif");
     // HEIC lib is lazy-loaded only when native decode fails (see convertHeicImage)
-    if (source === "zip" && target === "zip") needs.add("jszip");
     if (spreadsheet.includes(source) && target === "pdf") {
       needs.add("xlsx");
       needs.add("jspdf");
@@ -627,13 +624,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setConversionProgress(100, "Output file ready.");
         return;
       }
-      if (sourceFormat === "zip" && targetFormat === "zip") {
-        setConversionProgress(18, "Repackaging archive...");
-        await createZip(file);
-        setConversionProgress(100, "Output file ready.");
-        return;
-      }
-
       alert(
         `Format ${(targetFormat || "unknown").toUpperCase()} is not completely mapped in this demo yet.`,
       );
@@ -1452,15 +1442,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     const url = URL.createObjectURL(content);
     downloadFile(url, file.name.replace(/\.[^/.]+$/, "") + "_images.zip");
-  }
-
-  // Create Archive via JSZip
-  async function createZip(file) {
-    const zip = new JSZip();
-    zip.file(file.name, file);
-    const content = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(content);
-    downloadFile(url, file.name.replace(/\.[^/.]+$/, "") + ".zip");
   }
 
   // Load FFmpeg dynamically

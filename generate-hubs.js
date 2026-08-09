@@ -38,7 +38,6 @@ const BASIC_MAPPING = {
   txt: ["pdf", "md", "html", "docx"],
   docx: ["pdf", "txt", "md"],
   xml: ["json", "txt"],
-  zip: ["zip"],
 };
 
 const IMAGE = new Set(["jpg", "png", "webp", "bmp", "gif", "avif", "tiff", "heic"]);
@@ -47,7 +46,7 @@ const MEDIA = new Set([
   "mp3", "wav", "ogg", "aac", "m4a", "flac",
 ]);
 const DOCUMENT = new Set([
-  "docx", "xlsx", "xls", "csv", "ods", "json", "md", "html", "txt", "xml", "zip",
+  "docx", "xlsx", "xls", "csv", "ods", "json", "md", "html", "txt", "xml",
 ]);
 
 const HUBS = [

@@ -51,7 +51,6 @@ const BASIC_LABELS = {
   html: "HTML Document",
   txt: "Plain Text File",
   xml: "XML Document",
-  zip: "ZIP Archive",
   docx: "Word Document (DOCX)",
 };
 

@@ -29,10 +29,6 @@ const BASIC_MAPPING = {
   aac: ["mp3", "wav"],
   m4a: ["mp3", "wav"],
   flac: ["mp3", "wav"],
-  xlsx: ["csv", "json"],
-  xls: ["xlsx", "csv", "json"],
-  csv: ["xlsx", "json"],
-  json: ["xlsx", "csv"],
   md: ["html", "pdf", "txt", "docx"],
   html: ["md", "pdf", "txt", "docx"],
   txt: ["pdf", "md", "html", "docx"],
@@ -86,7 +82,6 @@ function getIcon(ext) {
     return "fa-file-audio";
   if (ext === "pdf") return "fa-file-pdf";
   if (ext === "docx") return "fa-file-word";
-  if (["xlsx", "xls", "csv"].includes(ext)) return "fa-file-excel";
   if (["json", "xml", "html"].includes(ext)) return "fa-file-code";
   return "fa-file-alt";
 }

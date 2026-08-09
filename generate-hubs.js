@@ -28,10 +28,6 @@ const BASIC_MAPPING = {
   aac: ["mp3", "wav"],
   m4a: ["mp3", "wav"],
   flac: ["mp3", "wav"],
-  xlsx: ["csv", "json"],
-  xls: ["xlsx", "csv", "json"],
-  csv: ["xlsx", "json"],
-  json: ["xlsx", "csv"],
   md: ["html", "pdf", "txt", "docx"],
   html: ["md", "pdf", "txt", "docx"],
   txt: ["pdf", "md", "html", "docx"],
@@ -45,7 +41,7 @@ const MEDIA = new Set([
   "mp3", "wav", "ogg", "aac", "m4a", "flac",
 ]);
 const DOCUMENT = new Set([
-  "docx", "xlsx", "xls", "csv", "json", "md", "html", "txt", "xml",
+  "docx", "md", "html", "txt", "xml", "json",
 ]);
 
 const HUBS = [
@@ -74,7 +70,7 @@ const HUBS = [
     title: "Document Converters",
     h1: "Free Document Converters",
     description:
-      "Convert Word, Excel, CSV, Markdown, HTML, and JSON files locally. Ideal for sensitive documents that should never be uploaded to the cloud.",
+      "Convert Word, Markdown, HTML, XML, and text files locally. Ideal for sensitive documents that should never be uploaded to the cloud.",
     metaDescription:
       "Convert documents online for free: DOCX, XLSX, CSV, Markdown, HTML, JSON and more. Private browser-based conversion on Covertfily.",
     match: (from, to) => DOCUMENT.has(from) || DOCUMENT.has(to),

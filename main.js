@@ -23,10 +23,6 @@ const formatMapping = {
   aac: ["mp3", "wav"],
   m4a: ["mp3", "wav"],
   flac: ["mp3", "wav"],
-  xlsx: ["csv", "json"],
-  xls: ["xlsx", "csv", "json"],
-  csv: ["xlsx", "json"],
-  json: ["xlsx", "csv"],
   md: ["html", "pdf", "txt", "docx"],
   html: ["md", "pdf", "txt", "docx"],
   txt: ["pdf", "md", "html", "docx"],
@@ -58,9 +54,6 @@ const formatLabels = {
   aac: "AAC Audio",
   m4a: "M4A Audio",
   flac: "FLAC Audio",
-  xlsx: "Excel (XLSX)",
-  xls: "Excel (XLS)",
-  csv: "CSV Data",
   json: "JSON Data",
   md: "Markdown (MD)",
   html: "HTML Page",
@@ -357,7 +350,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.setConversionProgress = setConversionProgress;
 
   const SCRIPT_LIBS = {
-    xlsx: "https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js",
     jszip: "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
     pdfjs: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
     jspdf: "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
@@ -404,13 +396,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const target = (to || "").toLowerCase();
     const needs = new Set();
 
-    const spreadsheet = ["xlsx", "xls", "csv", "json"];
     const rasterTargets = ["png", "jpg", "jpeg", "webp", "bmp"];
     const mediaTargets = [
       "mp4", "webm", "mov", "avi", "mkv", "mp3", "wav", "ogg", "aac", "m4a", "flac",
     ];
 
-    if (spreadsheet.includes(source) || spreadsheet.includes(target)) needs.add("xlsx");
     if (source === "pdf" || target === "pdf") {
       needs.add("pdfjs");
       needs.add("jspdf");
@@ -488,19 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // 2. Spreadsheet Conversions using SheetJS (XLSX, CSV, JSON, XLS)
-      if (
-        ["xlsx", "xls", "csv", "json"].includes(targetFormat) &&
-        (["xlsx", "xls", "csv", "json"].includes(sourceFormat) ||
-          file.name.match(/\.(xlsx|xls|csv|json)$/i))
-      ) {
-        setConversionProgress(18, "Reading spreadsheet data...");
-        await convertSpreadsheet(file, targetFormat);
-        setConversionProgress(100, "Output file ready.");
-        return;
-      }
-
-      // 3. Media Conversions (MP4, WebM, MP3, etc.)
+      // 2. Media Conversions (MP4, WebM, MP3, etc.)
       if (
         [
           "mp4",
@@ -1182,38 +1160,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     throw new Error(`XML to ${targetFormat.toUpperCase()} is not supported`);
-  }
-
-  // Convert Spreadsheets via SheetJS
-  async function convertSpreadsheet(file, targetFormat) {
-    setConversionProgress(28, "Parsing workbook...");
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data);
-    const baseName = file.name.replace(/\.[^/.]+$/, "");
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    let blob;
-
-    setConversionProgress(68, "Writing output file...");
-
-    if (targetFormat === "csv") {
-      blob = new Blob([XLSX.utils.sheet_to_csv(firstSheet)], {
-        type: "text/csv",
-      });
-    } else if (targetFormat === "json") {
-      const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: null });
-      blob = new Blob([JSON.stringify(rows, null, 2)], {
-        type: "application/json",
-      });
-    } else {
-      const output = XLSX.write(workbook, {
-        bookType: targetFormat,
-        type: "array",
-      });
-      blob = new Blob([output], { type: "application/octet-stream" });
-    }
-
-    const url = URL.createObjectURL(blob);
-    downloadFile(url, `${baseName}.${targetFormat}`);
   }
 
   // Convert Text data (Markdown to HTML etc)

@@ -8,7 +8,7 @@
 
 - **Privacy-first** — files never leave your device
 - **No signup or watermarks** — free to use
-- **Wide format support** — images, PDFs, documents, spreadsheets, audio, and video
+- **Wide format support** — images, PDFs, documents, audio, and video
 - **Specialized tools** — PDF merge/compress/watermark, OCR, video trim/compress, image utilities, and more
 - **Static site** — no backend, no database, no build step
 

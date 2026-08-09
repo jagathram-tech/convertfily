@@ -54,7 +54,6 @@
     <link rel="stylesheet" href="style.css?v=2.1.2">
     
     <!-- Libraries for Client-Side Conversion -->
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
@@ -413,10 +412,6 @@
                                     <div class="dropdown-group-label text-[11px] font-extrabold text-slate-400 uppercase tracking-wider px-3 py-1 mt-2">Documents</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="pdf" onclick="selectFromFormat('pdf','PDF')">PDF Document</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="docx" onclick="selectFromFormat('docx','Word (DOCX)')">Word (DOCX)</div>
-                                    <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="xlsx" onclick="selectFromFormat('xlsx','Excel')">Excel (XLSX)</div>
-                                    <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="xls" onclick="selectFromFormat('xls','Excel (XLS)')">Excel (XLS)</div>
-                                    <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="csv" onclick="selectFromFormat('csv','CSV')">CSV Data</div>
-                                    <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="json" onclick="selectFromFormat('json','JSON Data')">JSON Data</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="xml" onclick="selectFromFormat('xml','XML Data')">XML Data</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="md" onclick="selectFromFormat('md','Markdown')">Markdown (MD)</div>
                                     <div class="dropdown-item px-3 py-2.5 rounded-lg text-[14px] font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 cursor-pointer transition-colors" data-value="html" onclick="selectFromFormat('html','HTML')">HTML Page</div>
@@ -542,10 +537,6 @@
                 'aac': ['mp3','wav'],
                 'm4a': ['mp3','wav'],
                 'flac': ['mp3','wav'],
-                'xlsx': ['csv','json'],
-                'xls': ['xlsx','csv','json'],
-                'csv': ['xlsx','json'],
-                'json': ['xlsx','csv'],
                 'md': ['html','pdf','txt','docx'],
                 'html': ['md','pdf','txt','docx'],
                 'txt': ['pdf','md','html','docx'],
@@ -556,7 +547,7 @@
                 'jpg':'JPG/JPEG','png':'PNG','webp':'WebP','bmp':'BMP','gif':'GIF','svg':'SVG','avif':'AVIF','tiff':'TIFF','heic':'HEIC/HEIF',
                 'pdf':'PDF Document','mp4':'MP4 Video','webm':'WebM Video','mov':'MOV Video','avi':'AVI Video','mkv':'MKV Video',
                 'flv':'FLV Video','wmv':'WMV Video','mp3':'MP3 Audio','wav':'WAV Audio','ogg':'OGG Audio','aac':'AAC Audio',
-                'm4a':'M4A Audio','flac':'FLAC Audio','xlsx':'Excel (XLSX)','xls':'Excel (XLS)','csv':'CSV Data','json':'JSON Data',
+                'm4a':'M4A Audio','flac':'FLAC Audio','json':'JSON Data',
                 'md':'Markdown (MD)','html':'HTML Page','txt':'Plain Text (TXT)','xml':'XML Data',
                 'docx':'Word Document (DOCX)'
             };

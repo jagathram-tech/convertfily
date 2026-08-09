@@ -41,7 +41,7 @@ All attached to `window` and referenced inline in HTML:
 
 ## CDN Versions (Locked)
 
-Font Awesome 6.4.0 (cdnjs) · Inter wght@400-800 (Google Fonts) · SheetJS 0.20.1 · PDF.js 3.11.174 · pdf-lib (unpkg) · jspdf 2.5.1 · mammoth 1.6.0 · docx 7.1.1 · marked + Turndown · jszip 3.10.1 · FFmpeg.wasm 0.12.10+0.12.6 (video only) · SortableJS 1.15.0 · Tesseract.js v5 · UTIF 3.1.0
+Font Awesome 6.4.0 (cdnjs) · Inter wght@400-800 (Google Fonts) · PDF.js 3.11.174 · pdf-lib (unpkg) · jspdf 2.5.1 · mammoth 1.6.0 · docx 7.1.1 · marked + Turndown · jszip 3.10.1 · FFmpeg.wasm 0.12.10+0.12.6 (video only) · SortableJS 1.15.0 · Tesseract.js v5 · UTIF 3.1.0
 
 ## Tool Library Patterns
 

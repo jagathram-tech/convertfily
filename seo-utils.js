@@ -42,9 +42,6 @@ const BASIC_LABELS = {
   aac: "AAC Audio",
   m4a: "M4A Audio",
   flac: "FLAC Audio",
-  xlsx: "Excel Spreadsheet (XLSX)",
-  xls: "Excel Spreadsheet (XLS)",
-  csv: "CSV Spreadsheet",
   json: "JSON Data File",
   md: "Markdown Document",
   html: "HTML Document",
@@ -58,7 +55,6 @@ const FORMAT_ALIASES = {
   png: ["png"],
   pdf: ["pdf"],
   docx: ["docx", "word", "doc"],
-  xlsx: ["xlsx", "excel"],
   mp3: ["mp3"],
   mp4: ["mp4"],
 };

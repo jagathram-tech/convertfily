@@ -45,111 +45,142 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=2.1.2">
     <style>
-        /* Single-viewport collage workspace — no page scroll, no options scrollbar */
+        /* Viewport-percentage layout: everything stays inside one screen */
         html, body {
+            width: 100%;
             height: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
         }
+        *, *::before, *::after { box-sizing: border-box; }
+
         body.elevra-theme > .elevra-workspace {
-            height: 100dvh;
-            max-height: 100dvh;
-            gap: 0.35rem !important;
-            padding: 0.4rem 0.75rem 0.4rem;
-            box-sizing: border-box;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100vh !important;
+            height: 100dvh !important;
+            max-height: 100vh !important;
+            max-height: 100dvh !important;
+            margin: 0 !important;
+            padding: 0.8vh 1.2vw !important;
+            gap: 0.8vh !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
         }
+
         body.elevra-theme > .elevra-workspace > nav {
-            flex-shrink: 0;
+            flex: 0 0 auto;
+            max-height: 7vh;
+            width: 100%;
+        }
+        body.elevra-theme > .elevra-workspace > nav .cf-logo {
+            max-height: 4.5vh;
+            width: auto;
         }
         body.elevra-theme > .elevra-workspace > footer {
-            display: none; /* keep tool fully on one screen */
+            display: none !important;
         }
+
         main {
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-height: 0;
+            max-height: 100%;
+            width: 100%;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .tool-container {
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-height: 0;
-            max-width: none;
             width: 100%;
+            max-width: 100%;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
+            gap: 0.8vh;
             overflow: hidden;
         }
 
         .section-title {
+            flex: 0 0 auto;
             text-align: center;
-            margin: 0 0 0.4rem !important;
-            flex-shrink: 0;
-            line-height: 1.2;
+            margin: 0 !important;
+            line-height: 1.15;
+            max-height: 8vh;
+            overflow: hidden;
         }
         .section-title i {
-            font-size: 1.15rem !important;
-            margin-bottom: 0.15rem;
+            font-size: clamp(0.85rem, 2.2vh, 1.2rem) !important;
+            margin-bottom: 0.2vh;
             display: inline-block;
+            color: var(--primary);
         }
         .section-title h1 {
-            font-size: 1.2rem;
-            margin: 0.1rem 0;
+            font-size: clamp(0.95rem, 2.4vh, 1.35rem);
+            margin: 0.2vh 0;
             font-weight: 800;
         }
         .section-title p {
-            font-size: 0.78rem;
+            font-size: clamp(0.68rem, 1.5vh, 0.85rem);
             margin: 0;
             color: var(--text-muted);
         }
 
+        /* Side panel ~22% width, preview takes the rest; both 100% of remaining height */
         .collage-layout {
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-height: 0;
+            width: 100%;
+            height: 100%;
             display: grid;
-            grid-template-columns: minmax(220px, 260px) 1fr;
-            gap: 0.65rem;
-            margin-top: 0;
+            grid-template-columns: minmax(0, 22%) minmax(0, 78%);
+            gap: 1vw;
+            margin: 0;
             overflow: hidden;
         }
 
         .controls-pane {
+            width: 100%;
+            height: 100%;
+            max-height: 100%;
+            min-height: 0;
+            min-width: 0;
             background: white;
-            padding: 0.65rem 0.75rem;
-            border-radius: 0.85rem;
+            padding: 1.2vh 1vw;
+            border-radius: clamp(0.5rem, 1.2vh, 0.85rem);
             border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 0.45rem;
-            align-self: stretch;
-            min-height: 0;
-            max-height: none;
-            overflow: hidden; /* no dedicated options scrollbar */
+            gap: 0.9vh;
+            overflow: hidden;
+            justify-content: flex-start;
         }
         .controls-pane > hr {
             border: 0;
             border-top: 1px solid var(--border);
-            margin: 0.15rem 0 !important;
-            flex-shrink: 0;
+            margin: 0.2vh 0 !important;
+            flex: 0 0 auto;
         }
 
         .layout-toggle {
             display: flex;
-            gap: 0.4rem;
-            margin-bottom: 0;
+            gap: 0.5vw;
+            width: 100%;
         }
         .layout-toggle .tab-btn {
-            flex: 1;
-            max-width: none;
-            padding: 0.4rem 0.45rem;
+            flex: 1 1 50%;
+            min-width: 0;
+            padding: 0.8vh 0.4vw;
             border-radius: 999px;
             font-weight: 600;
-            font-size: 0.72rem;
+            font-size: clamp(0.62rem, 1.35vh, 0.78rem);
             cursor: pointer;
             border: none;
             background: #e2e8f0;
@@ -163,86 +194,112 @@
         #gridSettings {
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
-        }
-        #gridSettings .control-group {
-            min-width: 0;
-            flex: none;
+            gap: 0.7vh;
+            width: 100%;
+            min-height: 0;
         }
 
         .upload-area {
             border: 1.5px dashed #cbd5e1;
-            border-radius: 0.6rem;
-            padding: 0.55rem 0.5rem;
+            border-radius: 0.55rem;
+            padding: 1vh 0.6vw;
             text-align: center;
             cursor: pointer;
             transition: 0.15s;
             background: #f8fafc;
+            width: 100%;
         }
         .upload-area:hover { border-color: var(--primary); background: #eff6ff; }
-        .upload-area i { font-size: 1.15rem !important; margin-bottom: 0.2rem !important; }
-        .upload-area h4 { margin: 0; font-size: 0.82rem; font-weight: 700; }
-        .upload-area p { margin: 0.1rem 0 0 !important; font-size: 0.7rem !important; }
+        .upload-area i {
+            font-size: clamp(0.9rem, 2vh, 1.2rem) !important;
+            margin-bottom: 0.3vh !important;
+            color: #94a3b8;
+        }
+        .upload-area h4 {
+            margin: 0;
+            font-size: clamp(0.72rem, 1.5vh, 0.88rem);
+            font-weight: 700;
+        }
+        .upload-area p {
+            margin: 0.2vh 0 0 !important;
+            font-size: clamp(0.62rem, 1.3vh, 0.75rem) !important;
+            color: var(--text-muted);
+        }
 
         .thumbnail-strip {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.3rem;
-            margin-top: 0.35rem;
-            max-height: 4.5rem;
+            gap: 0.4vh 0.35vw;
+            margin-top: 0.4vh;
+            max-height: 8vh;
             overflow: hidden;
+            width: 100%;
             align-content: flex-start;
         }
         .thumbnail {
-            width: 2.1rem;
-            height: 2.1rem;
+            width: clamp(1.5rem, 3.5vh, 2.2rem);
+            height: clamp(1.5rem, 3.5vh, 2.2rem);
             object-fit: cover;
             border-radius: 0.3rem;
             border: 1.5px solid white;
             box-shadow: 0 1px 3px rgba(0,0,0,0.12);
         }
 
-        .control-group { display: flex; flex-direction: column; gap: 0.2rem; flex-shrink: 0; }
-        .control-header { display: flex; justify-content: space-between; align-items: center; }
-        .control-label { font-weight: 600; color: var(--text-main); font-size: 0.78rem; }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35vh;
+            flex: 0 0 auto;
+            width: 100%;
+            min-width: 0;
+        }
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5vw;
+        }
+        .control-label {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: clamp(0.68rem, 1.45vh, 0.82rem);
+        }
         .control-val {
-            font-size: 0.68rem;
+            font-size: clamp(0.6rem, 1.25vh, 0.72rem);
             color: white;
             background: var(--primary);
-            padding: 0.1rem 0.4rem;
+            padding: 0.15vh 0.5vw;
             border-radius: 999px;
             font-weight: 600;
+            flex-shrink: 0;
         }
 
-        select, input[type="color"] {
-            width: 100%;
-            padding: 0.3rem;
-            border-radius: 0.4rem;
-            border: 1px solid var(--border);
-            font-family: inherit;
-            font-size: 0.8rem;
-        }
         input[type="color"] {
-            width: 2.5rem;
-            height: 1.75rem;
+            width: clamp(1.8rem, 4vh, 2.4rem);
+            height: clamp(1.4rem, 3vh, 1.8rem);
             cursor: pointer;
             padding: 0.1rem;
+            border-radius: 0.35rem;
+            border: 1px solid var(--border);
             flex-shrink: 0;
+            background: white;
         }
 
         input[type="range"] {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
-            height: 0.3rem;
-            border-radius: 0.15rem;
+            height: 0.55vh;
+            min-height: 4px;
+            border-radius: 999px;
             background: #e2e8f0;
             outline: none;
-            margin: 0.2rem 0 0.1rem;
+            margin: 0.4vh 0 0;
         }
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 0.95rem;
-            width: 0.95rem;
+            width: clamp(0.85rem, 1.8vh, 1.05rem);
+            height: clamp(0.85rem, 1.8vh, 1.05rem);
             border-radius: 50%;
             background: var(--primary);
             cursor: pointer;
@@ -250,7 +307,7 @@
         }
 
         .btn-action {
-            padding: 0.5rem 0.65rem;
+            padding: 1vh 0.8vw;
             background: var(--primary);
             color: white;
             border: none;
@@ -258,87 +315,145 @@
             font-weight: 700;
             cursor: pointer;
             transition: 0.15s;
-            font-size: 0.8rem;
+            font-size: clamp(0.7rem, 1.5vh, 0.85rem);
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.4rem;
-            flex-shrink: 0;
+            gap: 0.4vw;
+            flex: 0 0 auto;
         }
         .btn-action:hover { opacity: 0.92; }
-        .btn-secondary { background: var(--bg-alt); color: var(--primary); border: 1px solid var(--primary); }
+        .btn-secondary {
+            background: var(--bg-alt);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
         .btn-secondary:hover { background: var(--primary); color: white; }
         .btn-danger {
             background: #fee2e2;
             color: #ef4444;
             border: 1px solid #fca5a5;
-            padding: 0.35rem 0.5rem;
-            font-size: 0.72rem;
-            margin-top: 0.25rem;
+            padding: 0.7vh 0.5vw;
+            font-size: clamp(0.65rem, 1.35vh, 0.78rem);
+            margin-top: 0.3vh;
         }
         .btn-danger:hover { background: #ef4444; color: white; }
 
         #btnDownload {
-            margin: 0.15rem 0 0 !important;
+            margin: 0.4vh 0 0 !important;
             max-width: none !important;
         }
 
+        /* Preview fills remaining grid cell; canvas is % of this box */
         .preview-pane {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            min-width: 0;
+            min-height: 0;
             background: #f8fafc;
             border: 1.5px dashed #e2e8f0;
-            border-radius: 0.85rem;
+            border-radius: clamp(0.5rem, 1.2vh, 0.85rem);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 0;
-            height: 100%;
-            padding: 0.65rem;
+            padding: 1.2vh 1vw;
             text-align: center;
-            flex-direction: column;
-            gap: 0.5rem;
             overflow: hidden;
         }
-        #placeholderText i { font-size: 2rem !important; margin-bottom: 0.35rem !important; }
-        #placeholderText h3 { font-size: 0.95rem; margin: 0.2rem 0; }
-        #placeholderText p { font-size: 0.78rem; margin: 0; }
+        #placeholderText {
+            max-width: 90%;
+        }
+        #placeholderText i {
+            font-size: clamp(1.4rem, 4vh, 2.2rem) !important;
+            margin-bottom: 0.8vh !important;
+            color: #cbd5e1;
+        }
+        #placeholderText h3 {
+            font-size: clamp(0.85rem, 2vh, 1.05rem);
+            margin: 0.4vh 0;
+            color: var(--text-muted);
+        }
+        #placeholderText p {
+            font-size: clamp(0.7rem, 1.5vh, 0.85rem);
+            margin: 0;
+            color: #94a3b8;
+        }
         #collageCanvas {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 96%;
+            max-height: 96%;
+            width: auto !important;
+            height: auto !important;
             object-fit: contain;
             border-radius: 0.4rem;
             box-shadow: 0 6px 18px rgba(0,0,0,0.12);
             display: none;
         }
 
-        #scatterSettings p { font-size: 0.72rem !important; margin: 0 0 0.25rem; }
+        #scatterSettings {
+            width: 100%;
+        }
+        #scatterSettings p {
+            font-size: clamp(0.65rem, 1.35vh, 0.78rem) !important;
+            margin: 0 0 0.4vh;
+            color: var(--text-muted);
+        }
 
-        @media (max-width: 56.25rem) {
-            html, body { height: auto; overflow: auto; }
-            body.elevra-theme > .elevra-workspace {
+        @media (max-width: 900px) {
+            html, body {
                 height: auto;
-                max-height: none;
-                overflow: visible;
-                gap: 0.75rem !important;
+                min-height: 100%;
+                overflow: auto;
             }
-            body.elevra-theme > .elevra-workspace > footer { display: block; }
-            main, .tool-container { overflow: visible; min-height: auto; }
-            .collage-layout {
-                grid-template-columns: 1fr;
+            body.elevra-theme > .elevra-workspace {
+                height: auto !important;
+                max-height: none !important;
+                min-height: 100dvh;
+                overflow: visible !important;
+                gap: 1rem !important;
+                padding: 0.75rem !important;
+            }
+            body.elevra-theme > .elevra-workspace > nav {
+                max-height: none;
+            }
+            body.elevra-theme > .elevra-workspace > footer {
+                display: block !important;
+            }
+            main, .tool-container {
                 overflow: visible;
                 min-height: auto;
-            }
-            .controls-pane {
-                overflow: visible;
-                max-height: none;
-            }
-            .preview-pane {
-                min-height: 16rem;
+                flex: none;
                 height: auto;
             }
-            #collageCanvas { max-height: 50vh; }
+            .collage-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: auto;
+                overflow: visible;
+                gap: 0.75rem;
+            }
+            .controls-pane {
+                height: auto;
+                max-height: none;
+                overflow: visible;
+            }
+            .preview-pane {
+                position: relative;
+                height: 50vh;
+                min-height: 280px;
+                max-height: 60vh;
+            }
+            #collageCanvas {
+                max-width: 94%;
+                max-height: 94%;
+            }
         }
     </style>
 

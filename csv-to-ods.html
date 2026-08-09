@@ -513,27 +513,34 @@
             }
 
             async function handleSingleFile(file) {
-                // Update dropzone to show selected file
-                document.getElementById("dropzoneIcon").innerHTML =
-                    '<i class="fas fa-check-circle" style="color: #10b981;"></i>';
-                document.getElementById("dropzoneTitle").textContent =
-                    "File Selected!";
-                document.getElementById("dropzoneSubtitle").textContent =
-                    file.name;
-
-                await new Promise((resolve) => setTimeout(resolve, 800));
-
                 const loading = document.getElementById("loading");
                 const progressContainer =
                     document.getElementById("progressContainer");
                 const resultArea = document.getElementById("resultArea");
                 const loadingText = document.getElementById("loadingText");
+                const progressFill =
+                    document.getElementById("progressBarFill") ||
+                    document.querySelector(".progress-bar-fill");
 
+                // Show loading + progress immediately so the UI never freezes
+                // on the "File Selected" dropzone while conversion runs.
                 dropzone.style.display = "none";
+                if (resultArea) resultArea.style.display = "none";
                 loading.style.display = "block";
                 if (progressContainer)
                     progressContainer.style.display = "block";
+                if (progressFill) progressFill.style.width = "0%";
                 loadingText.textContent = "Converting " + file.name + "...";
+                if (window.setConversionProgress) {
+                    window.setConversionProgress(2, "Preparing conversion...");
+                }
+
+                // Yield so the browser can paint the progress UI before heavy work
+                await new Promise((resolve) =>
+                    requestAnimationFrame(() =>
+                        requestAnimationFrame(resolve),
+                    ),
+                );
 
                 try {
                     await window.processFile(file, "csv", "ods");

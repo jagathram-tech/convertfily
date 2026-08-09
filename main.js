@@ -648,7 +648,18 @@ document.addEventListener("DOMContentLoaded", () => {
   /* Conversion Logic implementations */
   /* ---------------------------------------------------------------------- */
 
-  function canvasToBmpDataUrl(canvas) {
+  function yieldToUi() {
+    return new Promise((resolve) => {
+      if (typeof requestAnimationFrame === "function") {
+        requestAnimationFrame(() => setTimeout(resolve, 0));
+      } else {
+        setTimeout(resolve, 0);
+      }
+    });
+  }
+
+  /** Encode canvas pixels to a BMP Blob. Yields periodically so the progress UI can paint. */
+  async function canvasToBmpBlob(canvas, onProgress) {
     const ctx = canvas.getContext("2d");
     const { width, height } = canvas;
     const imageData = ctx.getImageData(0, 0, width, height);
@@ -657,6 +668,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const fileSize = 54 + pixelDataSize;
     const buffer = new ArrayBuffer(fileSize);
     const view = new DataView(buffer);
+    const pixels = imageData.data;
 
     view.setUint8(0, 0x42);
     view.setUint8(1, 0x4d);
@@ -670,27 +682,49 @@ document.addEventListener("DOMContentLoaded", () => {
     view.setUint32(34, pixelDataSize, true);
 
     let offset = 54;
+    // Yield every ~5% of rows so large images keep the progress bar visible/moving
+    const yieldEvery = Math.max(1, Math.floor(height / 20));
     for (let y = height - 1; y >= 0; y--) {
       for (let x = 0; x < width; x++) {
         const i = (y * width + x) * 4;
-        view.setUint8(offset++, imageData.data[i + 2]);
-        view.setUint8(offset++, imageData.data[i + 1]);
-        view.setUint8(offset++, imageData.data[i]);
+        view.setUint8(offset++, pixels[i + 2]);
+        view.setUint8(offset++, pixels[i + 1]);
+        view.setUint8(offset++, pixels[i]);
       }
       const padding = rowSize - width * 3;
       for (let p = 0; p < padding; p++) view.setUint8(offset++, 0);
+
+      const rowsDone = height - y;
+      if (rowsDone % yieldEvery === 0 || y === 0) {
+        if (onProgress) onProgress(rowsDone / height);
+        await yieldToUi();
+      }
     }
 
-    const bytes = new Uint8Array(buffer);
-    let binary = "";
-    for (let i = 0; i < bytes.length; i++) {
-      binary += String.fromCharCode(bytes[i]);
-    }
-    return `data:image/bmp;base64,${btoa(binary)}`;
+    return new Blob([buffer], { type: "image/bmp" });
   }
 
+  async function canvasToOutput(canvas, targetFormat, quality = 0.9) {
+    if (targetFormat === "bmp") {
+      return canvasToBmpBlob(canvas, (p) => {
+        setConversionProgress(
+          40 + Math.round(p * 55),
+          "Encoding BMP... " + Math.round(p * 100) + "%",
+        );
+      });
+    }
+    let mimeType = "image/png";
+    if (targetFormat === "jpg" || targetFormat === "jpeg")
+      mimeType = "image/jpeg";
+    else if (targetFormat === "webp") mimeType = "image/webp";
+    return canvas.toDataURL(mimeType, quality);
+  }
+
+  // Back-compat alias used by older call sites
   function canvasToOutputUrl(canvas, targetFormat, quality = 0.9) {
-    if (targetFormat === "bmp") return canvasToBmpDataUrl(canvas);
+    if (targetFormat === "bmp") {
+      throw new Error("BMP output requires async canvasToOutput()");
+    }
     let mimeType = "image/png";
     if (targetFormat === "jpg" || targetFormat === "jpeg")
       mimeType = "image/jpeg";
@@ -747,25 +781,39 @@ document.addEventListener("DOMContentLoaded", () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
+        img.onload = async () => {
+          try {
+            setConversionProgress(30, "Drawing image...");
+            await yieldToUi();
 
-          if (targetFormat === "jpg" || targetFormat === "jpeg") {
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+
+            if (targetFormat === "jpg" || targetFormat === "jpeg") {
+              ctx.fillStyle = "#FFFFFF";
+              ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            ctx.drawImage(img, 0, 0);
+
+            setConversionProgress(
+              40,
+              targetFormat === "bmp" ? "Encoding BMP..." : "Encoding image...",
+            );
+            await yieldToUi();
+
+            const output = await canvasToOutput(canvas, targetFormat, 0.9);
+            setConversionProgress(96, "Preparing download...");
+            downloadFile(
+              output,
+              file.name.replace(/\.[^/.]+$/, "") + `.${targetFormat}`,
+            );
+            resolve();
+          } catch (err) {
+            reject(err);
           }
-
-          ctx.drawImage(img, 0, 0);
-
-          const dataUrl = canvasToOutputUrl(canvas, targetFormat, 0.9);
-          downloadFile(
-            dataUrl,
-            file.name.replace(/\.[^/.]+$/, "") + `.${targetFormat}`,
-          );
-          resolve();
         };
         img.onerror = async () => {
           if (file.name.toLowerCase().endsWith(".eps")) {
@@ -940,8 +988,13 @@ document.addEventListener("DOMContentLoaded", () => {
     imgData.data.set(rgba);
     ctx.putImageData(imgData, 0, 0);
 
+    setConversionProgress(
+      40,
+      targetFormat === "bmp" ? "Encoding BMP..." : "Encoding image...",
+    );
+    const output = await canvasToOutput(canvas, targetFormat, 0.9);
     downloadFile(
-      canvasToOutputUrl(canvas, targetFormat, 0.9),
+      output,
       file.name.replace(/\.[^/.]+$/, "") + `.${targetFormat}`,
     );
   }
@@ -1259,9 +1312,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       await page.render({ canvasContext: context, viewport: viewport }).promise;
 
-      const dataUrl = canvasToOutputUrl(canvas, targetFormat);
-      const base64Data = dataUrl.split(",")[1];
-      zip.file(`page-${i}.${targetFormat}`, base64Data, { base64: true });
+      const output = await canvasToOutput(canvas, targetFormat);
+      if (output instanceof Blob) {
+        zip.file(`page-${i}.${targetFormat}`, output);
+      } else {
+        const base64Data = String(output).split(",")[1];
+        zip.file(`page-${i}.${targetFormat}`, base64Data, { base64: true });
+      }
     }
 
     setConversionProgress(86, "Packaging output file...");
@@ -1943,9 +2000,15 @@ function downloadFile(urlOrBlob, filename) {
     dlBtn.textContent = "Download";
   }
 
-  // Show the appropriate UI container for the download button
+  // Wire up download UI. Prefer not to flash the result area while the
+  // loading/progress panel is still visible (page scripts hide loading after processFile).
+  const loadingEl = document.getElementById("loading");
+  const loadingVisible =
+    loadingEl &&
+    loadingEl.style.display !== "none" &&
+    getComputedStyle(loadingEl).display !== "none";
   const resultArea = document.getElementById("resultArea");
-  if (resultArea) {
+  if (resultArea && !loadingVisible) {
     resultArea.style.display = "block";
   }
   const downloadContainer = document.getElementById("downloadContainer");
@@ -2006,16 +2069,24 @@ function downloadFile(urlOrBlob, filename) {
 
   // Progress Bar Utility
   window.updateProgress = function (percent) {
-    const fill = document.querySelector(".progress-bar-fill");
-    const container = document.querySelector(".progress-container");
+    const fill =
+      document.getElementById("progressBarFill") ||
+      document.querySelector(".progress-bar-fill");
+    const container =
+      document.getElementById("progressContainer") ||
+      document.querySelector(".progress-container");
     if (container) container.style.display = "block";
-    if (fill) fill.style.width = percent + "%";
+    if (fill) fill.style.width = Math.max(0, Math.min(100, percent)) + "%";
   };
 
   window.hideProgress = function () {
-    const container = document.querySelector(".progress-container");
+    const container =
+      document.getElementById("progressContainer") ||
+      document.querySelector(".progress-container");
     if (container) container.style.display = "none";
-    const fill = document.querySelector(".progress-bar-fill");
+    const fill =
+      document.getElementById("progressBarFill") ||
+      document.querySelector(".progress-bar-fill");
     if (fill) fill.style.width = "0%";
   };
 

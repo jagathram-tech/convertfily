@@ -1940,11 +1940,7 @@ function downloadFile(urlOrBlob, filename) {
     dlBtn.href = url;
     dlBtn.download = filename;
     // Clear previous contents and set the new label
-    dlBtn.innerHTML = "";
-    const icon = document.createElement("i");
-    icon.className = "fas fa-download";
-    dlBtn.appendChild(icon);
-    dlBtn.appendChild(document.createTextNode(" Download " + filename));
+    dlBtn.textContent = "Download";
   }
 
   // Show the appropriate UI container for the download button
@@ -1983,11 +1979,7 @@ function downloadFile(urlOrBlob, filename) {
       // Reset button attributes and label
       dlBtn.removeAttribute("href");
       dlBtn.removeAttribute("download");
-      dlBtn.innerHTML = "";
-      const icon = document.createElement("i");
-      icon.className = "fas fa-download";
-      dlBtn.appendChild(icon);
-      dlBtn.appendChild(document.createTextNode(" Download Converted File"));
+      dlBtn.textContent = "Download";
     }
 
     const loading = document.getElementById("loading");

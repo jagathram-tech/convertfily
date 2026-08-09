@@ -1732,92 +1732,166 @@ document.addEventListener("DOMContentLoaded", () => {
     return map[targetFormat] || "application/octet-stream";
   }
 
-  /** Explicit codecs — bare -i in/out fails for WebM (no auto libvpx pick). */
-  function buildFFmpegCommand(inputName, outputName, targetFormat) {
-    const common = ["-i", inputName, "-y", "-hide_banner"];
+  /**
+   * Explicit codecs + input demux hints.
+   * Bare `-i in out` fails for WebM; FLV often needs `-f flv`.
+   * Returns an array of command candidates (first success wins).
+   */
+  function buildFFmpegCommandCandidates(
+    inputName,
+    outputName,
+    targetFormat,
+    sourceExt,
+  ) {
+    const inputPrefix = [];
+    // Help demuxers that can't sniff every container from extension alone
+    if (sourceExt === "flv") inputPrefix.push("-f", "flv");
+    if (sourceExt === "wmv" || sourceExt === "asf")
+      inputPrefix.push("-f", "asf");
+
+    const common = [
+      ...inputPrefix,
+      "-i",
+      inputName,
+      "-y",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+    ];
+
     switch (targetFormat) {
       case "webm":
-        // Prefer VP8+Vorbis (widely present in ffmpeg.wasm core builds)
         return [
-          ...common,
-          "-c:v",
-          "libvpx",
-          "-b:v",
-          "1M",
-          "-crf",
-          "30",
-          "-deadline",
-          "realtime",
-          "-cpu-used",
-          "8",
-          "-c:a",
-          "libvorbis",
-          "-b:a",
-          "128k",
-          outputName,
+          [
+            ...common,
+            "-c:v",
+            "libvpx",
+            "-b:v",
+            "1M",
+            "-crf",
+            "30",
+            "-deadline",
+            "realtime",
+            "-cpu-used",
+            "8",
+            "-c:a",
+            "libvorbis",
+            "-b:a",
+            "128k",
+            outputName,
+          ],
         ];
       case "mp4":
       case "mov":
       case "mkv":
         return [
-          ...common,
-          "-c:v",
-          "libx264",
-          "-preset",
-          "ultrafast",
-          "-crf",
-          "28",
-          "-c:a",
-          "aac",
-          "-b:a",
-          "128k",
-          "-movflags",
-          "+faststart",
-          outputName,
+          [
+            ...common,
+            "-c:v",
+            "libx264",
+            "-preset",
+            "ultrafast",
+            "-crf",
+            "28",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "128k",
+            "-movflags",
+            "+faststart",
+            outputName,
+          ],
         ];
       case "avi":
         return [
-          ...common,
-          "-c:v",
-          "mpeg4",
-          "-q:v",
-          "5",
-          "-c:a",
-          "mp3",
-          "-b:a",
-          "128k",
-          outputName,
+          [
+            ...common,
+            "-c:v",
+            "mpeg4",
+            "-q:v",
+            "5",
+            "-c:a",
+            "libmp3lame",
+            "-b:a",
+            "128k",
+            outputName,
+          ],
         ];
       case "mp3":
+        // Several encoder flag variants — wasm builds differ
         return [
-          ...common,
-          "-vn",
-          "-c:a",
-          "libmp3lame",
-          "-b:a",
-          "192k",
-          outputName,
+          [
+            ...common,
+            "-vn",
+            "-sn",
+            "-dn",
+            "-map",
+            "0:a:0",
+            "-c:a",
+            "libmp3lame",
+            "-b:a",
+            "192k",
+            "-ar",
+            "44100",
+            "-ac",
+            "2",
+            outputName,
+          ],
+          [
+            ...common,
+            "-vn",
+            "-map",
+            "0:a:0",
+            "-c:a",
+            "libmp3lame",
+            "-q:a",
+            "4",
+            outputName,
+          ],
+          [
+            ...common,
+            "-vn",
+            "-c:a",
+            "libmp3lame",
+            "-b:a",
+            "192k",
+            outputName,
+          ],
+          // Last resort: first stream only (some FLVs label audio oddly)
+          [...common, "-vn", "-c:a", "libmp3lame", outputName],
         ];
       case "wav":
-        return [...common, "-vn", "-c:a", "pcm_s16le", outputName];
+        return [[...common, "-vn", "-c:a", "pcm_s16le", outputName]];
       case "ogg":
         return [
-          ...common,
-          "-vn",
-          "-c:a",
-          "libvorbis",
-          "-b:a",
-          "128k",
-          outputName,
+          [
+            ...common,
+            "-vn",
+            "-c:a",
+            "libvorbis",
+            "-b:a",
+            "128k",
+            outputName,
+          ],
         ];
       case "aac":
       case "m4a":
-        return [...common, "-vn", "-c:a", "aac", "-b:a", "192k", outputName];
+        return [[...common, "-vn", "-c:a", "aac", "-b:a", "192k", outputName]];
       case "flac":
-        return [...common, "-vn", "-c:a", "flac", outputName];
+        return [[...common, "-vn", "-c:a", "flac", outputName]];
       default:
-        return [...common, outputName];
+        return [[...common, outputName]];
     }
+  }
+
+  async function resetFFmpegInstance() {
+    if (ffmpeg) {
+      try {
+        if (typeof ffmpeg.terminate === "function") ffmpeg.terminate();
+      } catch (_) {}
+    }
+    ffmpeg = null;
+    ffmpegLoadPromise = null;
   }
 
   /** Browser-native WebM encode via MediaRecorder (fallback when FFmpeg lacks libvpx). */
@@ -1935,13 +2009,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Convert Video & Audio using actual FFmpeg.wasm Engine
   async function convertMedia(file, targetFormat) {
-    const ext = file.name.split(".").pop().toLowerCase();
-    const audioOnlyExt = ["mp3", "wav", "ogg", "flac", "aac", "m4a", "opus", "wma"];
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+    const audioOnlyExt = [
+      "mp3",
+      "wav",
+      "ogg",
+      "flac",
+      "aac",
+      "m4a",
+      "opus",
+      "wma",
+    ];
     const isAudio =
       file.type.startsWith("audio/") || audioOnlyExt.includes(ext);
     const isVideoTarget = ["mp4", "webm", "mov", "avi", "mkv"].includes(
       targetFormat,
     );
+    // FLV/WMV → audio is still a video source file for fallbacks
+    const extractAudioFromVideo =
+      ["mp3", "wav", "ogg", "aac", "m4a", "flac"].includes(targetFormat) &&
+      !isAudio;
 
     // If target is WAV and input is audio, do it 100% offline via Web Audio API
     if (targetFormat === "wav" && isAudio) {
@@ -1949,32 +2036,39 @@ document.addEventListener("DOMContentLoaded", () => {
         setConversionProgress(20, "Decoding audio...");
         const wavBlob = await convertAudioOffline(file);
         setConversionProgress(90, "Finalizing file...");
-        const url = URL.createObjectURL(wavBlob);
         downloadFile(
-          url,
+          wavBlob,
           file.name.replace(/\.[^/.]+$/, "") + ".wav",
         );
         setConversionProgress(100, "Done!");
         return;
       } catch (err) {
-        console.error("Offline WAV conversion failed, falling back to FFmpeg:", err);
+        console.error(
+          "Offline WAV conversion failed, falling back to FFmpeg:",
+          err,
+        );
       }
     }
 
-    const safeBase = (file.name || "media")
-      .replace(/\.[^/.]+$/, "")
-      .replace(/[^a-zA-Z0-9._-]/g, "_")
-      .slice(0, 40) || "media";
-    const inputName = "input_" + safeBase + "." + (ext || "bin");
-    const outputName = "output." + targetFormat;
+    // Short unique MEMFS names — long/weird paths trigger ErrnoError: FS error
+    const uid =
+      Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const inputExt = ext || "bin";
+    const inputName = "in_" + uid + "." + inputExt;
+    const outputName = "out_" + uid + "." + targetFormat;
     let lastError = null;
 
-    try {
+    async function runFFmpegPass() {
       setConversionProgress(12, "Loading media engine...");
       const ff = await loadFFmpeg();
-      const { fetchFile } = window.FFmpegUtil;
 
       setConversionProgress(18, "Writing file to memory...");
+      // Prefer raw bytes — more reliable than fetchFile for File objects
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      if (!bytes.length) {
+        throw new Error("Input file is empty.");
+      }
+
       try {
         await ff.deleteFile(inputName);
       } catch (_) {}
@@ -1982,49 +2076,126 @@ document.addEventListener("DOMContentLoaded", () => {
         await ff.deleteFile(outputName);
       } catch (_) {}
 
-      await ff.writeFile(inputName, await fetchFile(file));
+      await ff.writeFile(inputName, bytes);
+
+      const logs = [];
+      const onLog = ({ message }) => {
+        if (message) {
+          logs.push(message);
+          console.log("[ffmpeg]", message);
+        }
+      };
+      const onProgress = ({ progress }) => {
+        const pct = Math.max(
+          0,
+          Math.min(100, Math.round((progress || 0) * 100)),
+        );
+        setConversionProgress(24 + pct * 0.64, `Converting media... ${pct}%`);
+      };
+      ff.on("log", onLog);
+      ff.on("progress", onProgress);
 
       setConversionProgress(24, "Converting media...");
-      ff.on("progress", ({ progress }) => {
-        const pct = Math.max(0, Math.min(100, Math.round((progress || 0) * 100)));
-        setConversionProgress(24 + pct * 0.64, `Converting media... ${pct}%`);
-      });
+      const candidates = buildFFmpegCommandCandidates(
+        inputName,
+        outputName,
+        targetFormat,
+        inputExt,
+      );
 
-      const cmd = buildFFmpegCommand(inputName, outputName, targetFormat);
-      console.log("FFmpeg command:", cmd.join(" "));
-      await ff.exec(cmd);
+      let data = null;
+      let lastCmdErr = null;
 
-      setConversionProgress(92, "Finalizing file...");
-      const data = await ff.readFile(outputName);
+      for (let i = 0; i < candidates.length; i++) {
+        const cmd = candidates[i];
+        console.log("FFmpeg command attempt", i + 1, ":", cmd.join(" "));
+        try {
+          // Clear stale output from a previous attempt
+          try {
+            await ff.deleteFile(outputName);
+          } catch (_) {}
+
+          const code = await ff.exec(cmd);
+          if (code !== 0 && code !== undefined && code !== null) {
+            throw new Error(
+              "FFmpeg exit code " +
+                code +
+                (logs.length
+                  ? ": " + logs.slice(-4).join(" | ")
+                  : ""),
+            );
+          }
+
+          // readFile throws ErrnoError: FS error if encode failed / no output
+          data = await ff.readFile(outputName);
+          if (data && data.length) break;
+
+          throw new Error("FFmpeg produced an empty output file.");
+        } catch (cmdErr) {
+          lastCmdErr = cmdErr;
+          console.warn(
+            "FFmpeg attempt failed:",
+            mediaErrorMessage(cmdErr),
+          );
+          data = null;
+        }
+      }
+
+      // Cleanup input always
+      try {
+        await ff.deleteFile(inputName);
+      } catch (_) {}
+      try {
+        await ff.deleteFile(outputName);
+      } catch (_) {}
+
       if (!data || !data.length) {
-        throw new Error("FFmpeg produced an empty output file.");
+        throw lastCmdErr || new Error("All FFmpeg encode attempts failed.");
       }
 
       const mimeType = mimeForMediaTarget(targetFormat);
-      // Pass Uint8Array directly — data.buffer can be a larger underlying buffer
       const convertedBlob = new Blob([data], { type: mimeType });
-      const url = URL.createObjectURL(convertedBlob);
       downloadFile(
-        url,
+        convertedBlob,
         file.name.replace(/\.[^/.]+$/, "") + "." + targetFormat,
       );
-
-      try {
-        await ff.deleteFile(inputName);
-        await ff.deleteFile(outputName);
-      } catch (_) {}
-
       setConversionProgress(100, "Done!");
+    }
+
+    try {
+      await runFFmpegPass();
       return;
     } catch (error) {
       lastError = error;
       console.error("FFmpeg Conversion Error:", error);
+
+      // FS corruption after a failed run — reset engine and retry once
+      const msg = mediaErrorMessage(error).toLowerCase();
+      if (
+        msg.includes("fs error") ||
+        msg.includes("errno") ||
+        msg.includes("filesystem")
+      ) {
+        try {
+          setConversionProgress(20, "Recovering media engine...");
+          await resetFFmpegInstance();
+          await runFFmpegPass();
+          return;
+        } catch (retryErr) {
+          lastError = retryErr;
+          console.error("FFmpeg retry after FS reset failed:", retryErr);
+          await resetFFmpegInstance();
+        }
+      }
     }
 
     // WebM video fallback: browser MediaRecorder (no libvpx required)
     if (targetFormat === "webm" && !isAudio) {
       try {
-        setConversionProgress(28, "FFmpeg WebM failed — trying browser encoder...");
+        setConversionProgress(
+          28,
+          "FFmpeg WebM failed — trying browser encoder...",
+        );
         const webmBlob = await convertVideoToWebmBrowser(file);
         setConversionProgress(95, "Finalizing file...");
         downloadFile(
@@ -2039,7 +2210,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Audio fallback → WAV
+    // Audio fallback → WAV (browser-decodable audio only)
     if (isAudio && targetFormat !== "wav") {
       try {
         setConversionProgress(
@@ -2053,7 +2224,6 @@ document.addEventListener("DOMContentLoaded", () => {
           file.name.replace(/\.[^/.]+$/, "") + ".wav",
         );
         setConversionProgress(100, "Done!");
-        // Soft notice only — conversion still produced a downloadable file
         console.warn(
           `Conversion to ${targetFormat.toUpperCase()} failed; delivered WAV instead.`,
         );
@@ -2065,11 +2235,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const detail = mediaErrorMessage(lastError);
+    let hint = "";
+    if (extractAudioFromVideo && inputExt === "flv") {
+      hint =
+        " This FLV may have no audio track, or an audio codec the browser engine cannot decode.";
+    }
     throw new Error(
       "Media conversion failed" +
         (isVideoTarget ? " (video engine)" : "") +
         ": " +
-        detail,
+        detail +
+        hint,
     );
   }
 

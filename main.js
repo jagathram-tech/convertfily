@@ -23,10 +23,10 @@ const formatMapping = {
   aac: ["mp3", "wav"],
   m4a: ["mp3", "wav"],
   flac: ["mp3", "wav"],
-  xlsx: ["csv", "json", "pdf"],
-  xls: ["xlsx", "csv", "json", "pdf"],
-  csv: ["xlsx", "json", "pdf"],
-  json: ["xlsx", "csv", "pdf"],
+  xlsx: ["csv", "json"],
+  xls: ["xlsx", "csv", "json"],
+  csv: ["xlsx", "json"],
+  json: ["xlsx", "csv"],
   md: ["html", "pdf", "txt", "docx"],
   html: ["md", "pdf", "txt", "docx"],
   txt: ["pdf", "md", "html", "docx"],
@@ -426,10 +426,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (source === "html" && target === "md") needs.add("turndown");
     if (source === "tiff") needs.add("utif");
     // HEIC lib is lazy-loaded only when native decode fails (see convertHeicImage)
-    if (spreadsheet.includes(source) && target === "pdf") {
-      needs.add("xlsx");
-      needs.add("jspdf");
-    }
     if (mediaTargets.includes(target)) {
       // FFmpeg loaded separately in convertMedia
     }
@@ -604,15 +600,6 @@ document.addEventListener("DOMContentLoaded", () => {
           text = temp.textContent || temp.innerText || "";
         }
         await createDocxFromText(text, file.name);
-        setConversionProgress(100, "Output file ready.");
-        return;
-      }
-      if (
-        ["xlsx", "xls", "csv", "json"].includes(sourceFormat) &&
-        targetFormat === "pdf"
-      ) {
-        setConversionProgress(18, "Building PDF...");
-        await convertSpreadsheetToPdf(file);
         setConversionProgress(100, "Output file ready.");
         return;
       }
@@ -1134,14 +1121,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     return fullText;
-  }
-
-  async function convertSpreadsheetToPdf(file) {
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const text = XLSX.utils.sheet_to_csv(sheet);
-    await convertTextToPdf(text, file.name);
   }
 
   function xmlNodeToJson(node) {

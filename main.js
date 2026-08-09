@@ -1449,55 +1449,213 @@ document.addEventListener("DOMContentLoaded", () => {
     downloadFile(url, file.name.replace(/\.[^/.]+$/, "") + "_images.zip");
   }
 
-  // Load FFmpeg dynamically
+  // Load FFmpeg dynamically (pinned versions must stay in sync — see AGENTS.md)
   let ffmpeg = null;
-  async function loadFFmpeg() {
-    if (ffmpeg) return ffmpeg;
+  let ffmpegLoadPromise = null;
 
-    const loadingText = document.getElementById("loadingText");
-    if (loadingText) loadingText.textContent = "Loading Media Engine...";
+  function loadScriptTag(src) {
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[data-ffmpeg-src="${src}"]`);
+      if (existing) {
+        if (existing.dataset.loaded === "1") return resolve();
+        existing.addEventListener("load", () => resolve());
+        existing.addEventListener("error", () =>
+          reject(new Error("Failed to load script: " + src)),
+        );
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.dataset.ffmpegSrc = src;
+      script.onload = () => {
+        script.dataset.loaded = "1";
+        resolve();
+      };
+      script.onerror = () =>
+        reject(new Error("Failed to load script: " + src));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function ensureFFmpegLibs() {
+    // Prefer jsDelivr (more reliable than unpkg for large wasm assets)
+    const ffmpegUmd =
+      "https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js";
+    const utilUmd =
+      "https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js";
+    const ffmpegUmdFallback =
+      "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js";
+    const utilUmdFallback =
+      "https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js";
 
     if (!window.FFmpegWASM) {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src =
-          "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js";
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
+      try {
+        await loadScriptTag(ffmpegUmd);
+      } catch (_) {
+        await loadScriptTag(ffmpegUmdFallback);
+      }
     }
     if (!window.FFmpegUtil) {
-      await new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js";
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
+      try {
+        await loadScriptTag(utilUmd);
+      } catch (_) {
+        await loadScriptTag(utilUmdFallback);
+      }
     }
+    if (!window.FFmpegWASM || !window.FFmpegWASM.FFmpeg) {
+      throw new Error("FFmpeg library failed to initialize in the browser.");
+    }
+    if (!window.FFmpegUtil || !window.FFmpegUtil.toBlobURL) {
+      throw new Error("FFmpeg util library failed to initialize in the browser.");
+    }
+  }
 
-    const { FFmpeg } = window.FFmpegWASM;
-    const { toBlobURL } = window.FFmpegUtil;
-    ffmpeg = new FFmpeg();
+  async function loadFFmpeg() {
+    if (ffmpeg) return ffmpeg;
+    if (ffmpegLoadPromise) return ffmpegLoadPromise;
 
-    ffmpeg.on("log", ({ message }) => {
-      console.log(message);
-    });
+    ffmpegLoadPromise = (async () => {
+      const loadingText = document.getElementById("loadingText");
+      if (loadingText) loadingText.textContent = "Loading Media Engine...";
 
-    // Blob URLs bypass cross-origin Worker/CORS restrictions when loading from CDN
-    const coreBase =
-      "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
-    const workerURL =
-      "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js";
+      await ensureFFmpegLibs();
 
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${coreBase}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${coreBase}/ffmpeg-core.wasm`, "application/wasm"),
-      classWorkerURL: await toBlobURL(workerURL, "text/javascript"),
-    });
+      const { FFmpeg } = window.FFmpegWASM;
+      const { toBlobURL } = window.FFmpegUtil;
 
-    return ffmpeg;
+      // Multiple load strategies — "failed to import ffmpeg-core.js" is common
+      // when blob/worker/CDN paths disagree. Try safest combos first.
+      const strategies = [
+        {
+          name: "jsdelivr-esm-blob",
+          run: async (ff) => {
+            const base =
+              "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm";
+            await ff.load({
+              coreURL: await toBlobURL(
+                `${base}/ffmpeg-core.js`,
+                "text/javascript",
+              ),
+              wasmURL: await toBlobURL(
+                `${base}/ffmpeg-core.wasm`,
+                "application/wasm",
+              ),
+            });
+          },
+        },
+        {
+          name: "jsdelivr-umd-blob",
+          run: async (ff) => {
+            const base =
+              "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd";
+            await ff.load({
+              coreURL: await toBlobURL(
+                `${base}/ffmpeg-core.js`,
+                "text/javascript",
+              ),
+              wasmURL: await toBlobURL(
+                `${base}/ffmpeg-core.wasm`,
+                "application/wasm",
+              ),
+            });
+          },
+        },
+        {
+          name: "jsdelivr-umd-direct",
+          run: async (ff) => {
+            // Direct CDN URLs (no blob) — works when CORS allows worker import
+            const base =
+              "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd";
+            await ff.load({
+              coreURL: `${base}/ffmpeg-core.js`,
+              wasmURL: `${base}/ffmpeg-core.wasm`,
+            });
+          },
+        },
+        {
+          name: "unpkg-umd-blob-worker",
+          run: async (ff) => {
+            const coreBase =
+              "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+            const workerURL =
+              "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js";
+            await ff.load({
+              coreURL: await toBlobURL(
+                `${coreBase}/ffmpeg-core.js`,
+                "text/javascript",
+              ),
+              wasmURL: await toBlobURL(
+                `${coreBase}/ffmpeg-core.wasm`,
+                "application/wasm",
+              ),
+              classWorkerURL: await toBlobURL(workerURL, "text/javascript"),
+            });
+          },
+        },
+        {
+          name: "unpkg-esm-blob",
+          run: async (ff) => {
+            const base = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm";
+            await ff.load({
+              coreURL: await toBlobURL(
+                `${base}/ffmpeg-core.js`,
+                "text/javascript",
+              ),
+              wasmURL: await toBlobURL(
+                `${base}/ffmpeg-core.wasm`,
+                "application/wasm",
+              ),
+            });
+          },
+        },
+      ];
+
+      let lastErr = null;
+      for (const strategy of strategies) {
+        try {
+          if (loadingText) {
+            loadingText.textContent =
+              "Loading Media Engine (" + strategy.name + ")...";
+          }
+          console.log("[ffmpeg] trying load strategy:", strategy.name);
+          const instance = new FFmpeg();
+          instance.on("log", ({ message }) => {
+            console.log("[ffmpeg]", message);
+          });
+          await strategy.run(instance);
+          // Only cache after a successful load
+          ffmpeg = instance;
+          console.log("[ffmpeg] loaded via", strategy.name);
+          return ffmpeg;
+        } catch (err) {
+          lastErr = err;
+          console.warn(
+            "[ffmpeg] load strategy failed:",
+            strategy.name,
+            err && err.message ? err.message : err,
+          );
+        }
+      }
+
+      const detail =
+        (lastErr && lastErr.message) ||
+        (typeof lastErr === "string" ? lastErr : "unknown error");
+      throw new Error(
+        "Failed to load the media engine (ffmpeg-core). " +
+          "Check your network / ad-blocker, then hard-refresh and try again. " +
+          "Details: " +
+          detail,
+      );
+    })();
+
+    try {
+      return await ffmpegLoadPromise;
+    } catch (err) {
+      ffmpegLoadPromise = null;
+      ffmpeg = null;
+      throw err;
+    }
   }
 
   window.loadFFmpeg = loadFFmpeg;

@@ -1,0 +1,3 @@
+## 2026-06-25 - Non-Semantic CTAs Keyboard Accessibility
+**Learning:** Found an accessibility issue pattern in the app where core interactive elements like the dropzone and accordion headers are implemented using non-semantic tags (e.g., `<div onclick=...>`) without native keyboard accessibility.
+**Action:** Always manually ensure these non-semantic interactive elements are keyboard accessible by adding `role="button"`, `tabindex="0"`, `onkeydown` event handlers for 'Enter' and 'Space' keys, standard Tailwind focus classes (e.g., `focus-visible:ring-2`), and `aria-hidden="true"` to their nested FontAwesome icons.

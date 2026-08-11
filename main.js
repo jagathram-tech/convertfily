@@ -420,9 +420,13 @@ document.addEventListener("DOMContentLoaded", () => {
       // FFmpeg loaded separately in convertMedia
     }
 
+    // Performance Optimization: Load conversion libraries concurrently instead of sequentially
+    // Expected Impact: Reduces time-to-convert by fetching multiple CDN dependencies in parallel
+    const promises = [];
     for (const key of needs) {
-      await loadScriptOnce(SCRIPT_LIBS[key]);
+      promises.push(loadScriptOnce(SCRIPT_LIBS[key]));
     }
+    await Promise.all(promises);
 
     if (typeof pdfjsLib !== "undefined") {
       pdfjsLib.GlobalWorkerOptions.workerSrc =

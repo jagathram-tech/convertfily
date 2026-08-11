@@ -1,0 +1,3 @@
+## 2024-05-24 - Make primary interactive div keyboard accessible
+**Learning:** In this application, core interactive elements like the `#dropzone` CTA might be implemented as `<div>` tags with `onclick` handlers, rendering them completely inaccessible to keyboard and screen reader users since they lack semantic meaning and focusability.
+**Action:** Always verify that main CTAs and interactive blocks are either natively focusable elements (`<button>`, `<a>`) or explicitly given `role="button"`, `tabindex="0"`, keyboard event handlers (for Space/Enter), and visible focus states (`focus-visible:ring-2`) to ensure full keyboard navigation support.

@@ -456,9 +456,9 @@
                         </div>
                     </div>
 
-                    <div class="dropzone w-full p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 group" id="dropzone" onclick="goToDedicatedPage()">
+                    <div class="dropzone w-full p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-200 group focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none" id="dropzone" role="button" tabindex="0" onclick="goToDedicatedPage()" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToDedicatedPage(); }">
                         <div class="w-14 h-14 bg-blue-600 text-white rounded-xl flex items-center justify-center text-lg mb-4 transition-all duration-200" id="dropzoneIcon">
-                            <i class="fas fa-arrow-right group-hover:translate-x-0.5 transition-transform"></i>
+                            <i class="fas fa-arrow-right group-hover:translate-x-0.5 transition-transform" aria-hidden="true"></i>
                         </div>
                         <h3 class="text-base font-semibold text-slate-800 mb-1" id="dropzoneTitle">Open converter</h3>
                         <p class="text-sm text-slate-500" id="dropzoneSubtitle">Select both formats above to continue</p>

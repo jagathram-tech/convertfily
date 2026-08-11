@@ -420,9 +420,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // FFmpeg loaded separately in convertMedia
     }
 
-    for (const key of needs) {
-      await loadScriptOnce(SCRIPT_LIBS[key]);
-    }
+    // Load scripts concurrently to improve TTFB and conversion start times
+    await Promise.all(Array.from(needs).map(key => loadScriptOnce(SCRIPT_LIBS[key])));
 
     if (typeof pdfjsLib !== "undefined") {
       pdfjsLib.GlobalWorkerOptions.workerSrc =

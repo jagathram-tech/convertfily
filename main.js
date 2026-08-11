@@ -92,25 +92,34 @@ window.updateTargetDropdown = function (sourceFormat) {
     .join("");
 };
 
+const filterCache = new WeakMap();
+
 window.filterFormats = function (input, containerId) {
   const query = input.value.toLowerCase();
   const container = document.getElementById(containerId);
   if (!container) return;
 
   const items = container.querySelectorAll(".dropdown-item");
-  const labels = container.querySelectorAll(".dropdown-group-label");
+
+  let cache = filterCache.get(container);
+  if (!cache || cache.items.length !== items.length || cache.items[0]?.el !== items[0]) {
+    cache = {
+      items: Array.from(items).map(el => ({ el, text: el.textContent.toLowerCase() })),
+      noResults: container.parentElement.querySelector(".no-results")
+    };
+    filterCache.set(container, cache);
+  }
+
   let visibleCount = 0;
 
-  items.forEach((item) => {
-    const text = item.textContent.toLowerCase();
-    const matches = text.includes(query);
-    item.style.display = matches ? "block" : "none";
+  cache.items.forEach((item) => {
+    const matches = item.text.includes(query);
+    item.el.style.display = matches ? "block" : "none";
     if (matches) visibleCount++;
   });
 
-  const noResults = container.parentElement.querySelector(".no-results");
-  if (noResults)
-    noResults.style.display = visibleCount === 0 ? "block" : "none";
+  if (cache.noResults)
+    cache.noResults.style.display = visibleCount === 0 ? "block" : "none";
 };
 
 window.toggleDropdown = function (trigger, event) {

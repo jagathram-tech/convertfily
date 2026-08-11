@@ -513,6 +513,8 @@
         </section>
 
         <script>
+            const indexFilterCache = new WeakMap();
+
             const FORMAT_MAPPING = {
                 'jpg': ['png','webp','bmp','pdf'],
                 'png': ['jpg','webp','bmp','pdf'],
@@ -557,39 +559,59 @@
                 const container = document.getElementById(containerId);
                 if (!container) return;
 
+                const children = container.children;
+                let cache = indexFilterCache.get(container);
+
+                if (!cache || cache.length !== children.length || cache.firstElementChild !== children[0]) {
+                    cache = {
+                        length: children.length,
+                        firstElementChild: children[0],
+                        items: Array.from(children).map(child => ({
+                            el: child,
+                            isGroupLabel: child.classList.contains('dropdown-group-label'),
+                            isPlaceholder: child.classList.contains('dropdown-placeholder'),
+                            isItem: child.classList.contains('dropdown-item'),
+                            text: child.classList.contains('dropdown-item') ? child.textContent.toLowerCase() : ''
+                        })),
+                        noResults: container.parentElement.querySelector('.no-results')
+                    };
+                    indexFilterCache.set(container, cache);
+                }
+
                 let visible = 0;
                 let currentLabel = null;
                 let groupVisible = 0;
 
                 function flushGroup() {
                     if (currentLabel) {
-                        currentLabel.classList.toggle('hidden', groupVisible === 0);
+                        currentLabel.el.classList.toggle('hidden', groupVisible === 0);
                     }
                     visible += groupVisible;
                     groupVisible = 0;
                 }
 
-                Array.from(container.children).forEach(child => {
-                    if (child.classList.contains('dropdown-group-label')) {
+                cache.items.forEach(item => {
+                    if (item.isGroupLabel) {
                         flushGroup();
-                        currentLabel = child;
+                        currentLabel = item;
                         return;
                     }
-                    if (child.classList.contains('dropdown-placeholder')) {
-                        child.classList.toggle('hidden', query.length > 0);
+                    if (item.isPlaceholder) {
+                        item.el.classList.toggle('hidden', query.length > 0);
                         return;
                     }
-                    if (!child.classList.contains('dropdown-item')) return;
+                    if (!item.isItem) return;
 
-                    const match = !query || child.textContent.toLowerCase().includes(query);
-                    child.classList.toggle('hidden', !match);
+                    const match = !query || item.text.includes(query);
+                    item.el.classList.toggle('hidden', !match);
                     if (match) groupVisible++;
                 });
 
                 flushGroup();
 
-                const noResults = container.parentElement.querySelector('.no-results');
-                if (noResults) noResults.classList.toggle('hidden', visible !== 0);
+                if (cache.noResults) {
+                    cache.noResults.classList.toggle('hidden', visible !== 0);
+                }
             };
 
             window.selectFromFormat = function(val, label) {

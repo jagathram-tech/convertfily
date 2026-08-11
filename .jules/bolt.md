@@ -1,0 +1,3 @@
+## 2024-06-25 - DOM Read Caching for High-Frequency Events
+**Learning:** `querySelectorAll` and reading `.textContent` synchronously within an `input` event listener cause massive layout thrashing and performance degradation, especially in a framework-less environment with many DOM nodes.
+**Action:** Always cache static DOM elements and their text content in JS objects/arrays (or mapped to their container using a `WeakMap`) upfront. For dynamically updated lists, explicitly invalidate the cache by comparing list lengths or checking if DOM node references have changed (e.g. `cachedItems[0].el !== currentItems[0]`) to detect re-rendering.

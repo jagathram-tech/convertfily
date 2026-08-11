@@ -1,0 +1,3 @@
+## 2024-05-14 - Add ARIA Labels to Social Links & aria-hidden to FontAwesome Icons
+**Learning:** Found a systemic pattern where FontAwesome icons inside interactive elements (buttons/links) lacked `aria-hidden="true"`, causing screen readers to potentially double-read or misread icon class names alongside the parent `aria-label`. Additionally, several icon-only links lacked `aria-label`s entirely.
+**Action:** When auditing or adding new icon-only interactive elements in this app's design system, ensure the parent element (`<button>` or `<a>`) has a descriptive `aria-label`, and the inner `<i>` tag has `aria-hidden="true"`.

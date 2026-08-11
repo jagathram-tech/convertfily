@@ -2293,20 +2293,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function cleanXmlString(str) {
-    if (!str) return "";
-    // Remove illegal XML characters
-    let cleaned = str.replace(
-      /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x84\x86-\x9F\uFDD0-\uFDEF\uFFFE\uFFFF]/g,
-      "",
-    );
-    // Manual escaping for maximum safety in docx.js v7
-    return cleaned
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-  }
-
   // Helper to split long strings into manageable paragraph chunks for Word
   function chunkText(text, size = 5000) {
     const chunks = [];

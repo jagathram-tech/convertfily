@@ -2735,24 +2735,30 @@ function downloadFile(urlOrBlob, filename) {
 
     const clearBtn = document.getElementById("hubToolsSearchClear");
     const emptyState = document.getElementById("hubToolsEmpty");
-    const sections = document.querySelectorAll(".hub-tools-section");
+
+    // ⚡ Bolt: Cache DOM properties upfront
+    const cachedSections = Array.from(document.querySelectorAll(".hub-tools-section")).map(section => ({
+      el: section,
+      links: Array.from(section.querySelectorAll(".hub-tools-grid a")).map(link => ({
+        el: link,
+        searchData: (link.dataset.search || link.textContent || "").toLowerCase()
+      }))
+    }));
 
     function filterHubTools() {
       const query = search.value.toLowerCase().trim();
       let totalVisible = 0;
 
-      sections.forEach((section) => {
-        const links = section.querySelectorAll(".hub-tools-grid a");
+      cachedSections.forEach((section) => {
         let sectionVisible = 0;
 
-        links.forEach((link) => {
-          const haystack = (link.dataset.search || link.textContent || "").toLowerCase();
-          const match = !query || haystack.includes(query);
-          link.style.display = match ? "" : "none";
+        section.links.forEach((link) => {
+          const match = !query || link.searchData.includes(query);
+          link.el.style.display = match ? "" : "none";
           if (match) sectionVisible++;
         });
 
-        section.hidden = query.length > 0 && sectionVisible === 0;
+        section.el.hidden = query.length > 0 && sectionVisible === 0;
         totalVisible += sectionVisible;
       });
 
@@ -2820,25 +2826,30 @@ function downloadFile(urlOrBlob, filename) {
     });
 
     if (search) {
+      // ⚡ Bolt: Cache DOM properties upfront to avoid redundant reads
+      const groups = Array.from(dropdown.querySelectorAll(".tools-group")).map(group => {
+        const links = Array.from(group.querySelectorAll("a")).map(link => ({
+          el: link,
+          text: link.textContent.toLowerCase()
+        }));
+        const label = group.querySelector(".tools-group-label") || group.querySelector(":scope > div:first-child");
+        return { el: group, links, label };
+      });
+
       search.addEventListener("input", function() {
         const query = this.value.toLowerCase().trim();
-        const groups = dropdown.querySelectorAll(".tools-group");
+
         groups.forEach((group) => {
-          const links = group.querySelectorAll("a");
-          const label =
-            group.querySelector(".tools-group-label") ||
-            group.querySelector(":scope > div:first-child");
           let anyVisible = false;
 
-          links.forEach((link) => {
-            const match =
-              !query || link.textContent.toLowerCase().includes(query);
-            link.style.display = match ? "block" : "none";
+          group.links.forEach((link) => {
+            const match = !query || link.text.includes(query);
+            link.el.style.display = match ? "block" : "none";
             if (match) anyVisible = true;
           });
 
-          group.style.display = anyVisible ? "" : "none";
-          if (label) label.style.display = anyVisible ? "" : "none";
+          group.el.style.display = anyVisible ? "" : "none";
+          if (group.label) group.label.style.display = anyVisible ? "" : "none";
         });
       });
     }

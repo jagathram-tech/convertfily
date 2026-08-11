@@ -955,6 +955,14 @@
                 let activeCategory = 'all';
                 let searchQuery = '';
 
+                // ⚡ Bolt: Cache DOM properties upfront to avoid redundant reads during search
+                const cachedCards = Array.from(cards).map(card => ({
+                    el: card,
+                    category: card.dataset.category,
+                    title: card.querySelector('h3').textContent.toLowerCase(),
+                    desc: card.querySelector('p').textContent.toLowerCase()
+                }));
+
                 function filterTools() {
                     let visibleCount = 0;
                     const isSearching = searchQuery.length > 0;
@@ -962,26 +970,23 @@
                         ? activeCategory
                         : activeCategory;
 
-                    cards.forEach(card => {
-                        const category = card.dataset.category;
-                        const title = card.querySelector('h3').textContent.toLowerCase();
-                        const desc = card.querySelector('p').textContent.toLowerCase();
-
+                    cachedCards.forEach(card => {
                         const matchesCategory =
                             scopeCategory === 'all' ||
-                            category === scopeCategory ||
+                            card.category === scopeCategory ||
                             (scopeCategory === 'generate' &&
-                                (category === 'generate' || category === 'utility'));
+                                (card.category === 'generate' || card.category === 'utility'));
+
                         const matchesSearch =
                             !searchQuery ||
-                            title.includes(searchQuery) ||
-                            desc.includes(searchQuery);
+                            card.title.includes(searchQuery) ||
+                            card.desc.includes(searchQuery);
 
                         if (matchesCategory && matchesSearch) {
-                            card.style.display = 'flex';
+                            card.el.style.display = 'flex';
                             visibleCount++;
                         } else {
-                            card.style.display = 'none';
+                            card.el.style.display = 'none';
                         }
                     });
 

@@ -420,9 +420,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // FFmpeg loaded separately in convertMedia
     }
 
-    for (const key of needs) {
-      await loadScriptOnce(SCRIPT_LIBS[key]);
-    }
+    // ⚡ Bolt: Performance optimization
+    // Loading independent CDN scripts concurrently using Promise.all rather than
+    // sequentially awaiting each one to significantly improve conversion start times.
+    const loadPromises = Array.from(needs).map(key => loadScriptOnce(SCRIPT_LIBS[key]));
+    await Promise.all(loadPromises);
 
     if (typeof pdfjsLib !== "undefined") {
       pdfjsLib.GlobalWorkerOptions.workerSrc =

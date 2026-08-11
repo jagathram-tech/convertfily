@@ -1,0 +1,4 @@
+
+## 2024-11-20 - Ensure Non-Semantic Interactive Elements are Keyboard Accessible
+**Learning:** Found multiple instances (like `.dropzone` and `.accordion-header`) where `div` tags were used with `onclick` handlers for core interactions, but lacked `role="button"`, `tabindex="0"`, `onkeydown` listeners, and focus states. This prevents keyboard and screen reader users from triggering or navigating to these elements effectively. Also, FontAwesome icons inside these interactive buttons can be redundantly announced if missing `aria-hidden="true"`.
+**Action:** When adding or modifying interactive elements using non-semantic tags (`div`, `span`), always explicitly define standard interaction rules: `role="button"`, `tabindex="0"`, keyboard event handlers for Enter/Space, standard Tailwind `focus-visible` classes, and ensure nested icons have `aria-hidden="true"`.

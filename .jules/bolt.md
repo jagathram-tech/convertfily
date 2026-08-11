@@ -1,0 +1,3 @@
+## 2024-05-18 - Caching Static DOM Reads for High-Frequency Events
+**Learning:** In purely static HTML/JS sites without frameworks, high-frequency events like input filtering can cause significant main thread blocking if they repeatedly perform DOM queries (`querySelectorAll`) and read properties (`textContent`) across many elements.
+**Action:** Before optimizing purely visual layout logic, check event listeners bound to high-frequency events (`input`, `scroll`). Cache static DOM elements and their searchable text content in JS arrays (or mapped by their container) upfront on load to avoid redundant DOM tree reads and string allocations during frequent events.

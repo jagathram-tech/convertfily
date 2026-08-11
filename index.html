@@ -952,8 +952,17 @@
                 const cards = document.querySelectorAll('.dashboard-card');
                 const noResults = document.getElementById('dashboardNoResults');
 
+
                 let activeCategory = 'all';
                 let searchQuery = '';
+
+                // Cache DOM elements and their static content to avoid reading from the DOM during every search keystroke
+                const cardsCache = Array.from(cards).map(card => ({
+                    el: card,
+                    category: card.dataset.category,
+                    title: card.querySelector('h3').textContent.toLowerCase(),
+                    desc: card.querySelector('p').textContent.toLowerCase()
+                }));
 
                 function filterTools() {
                     let visibleCount = 0;
@@ -962,10 +971,8 @@
                         ? activeCategory
                         : activeCategory;
 
-                    cards.forEach(card => {
-                        const category = card.dataset.category;
-                        const title = card.querySelector('h3').textContent.toLowerCase();
-                        const desc = card.querySelector('p').textContent.toLowerCase();
+                    cardsCache.forEach(cacheItem => {
+                        const { el: card, category, title, desc } = cacheItem;
 
                         const matchesCategory =
                             scopeCategory === 'all' ||

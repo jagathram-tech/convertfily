@@ -1,0 +1,3 @@
+## 2024-06-15 - Caching DOM elements to prevent Layout Thrashing
+**Learning:** In a vanilla JS static site with many DOM elements (like tool cards), repeatedly querying the DOM (`querySelector`) and reading `textContent` within an `input` event listener (like a search filter) causes significant layout thrashing and performance degradation on slower devices.
+**Action:** When implementing client-side search/filtering on static lists, extract and cache the required DOM elements and their text content into a JavaScript array on initialization (e.g. `DOMContentLoaded`), and iterate over this array during the filter event.

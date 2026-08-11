@@ -955,6 +955,14 @@
                 let activeCategory = 'all';
                 let searchQuery = '';
 
+                // ⚡ Bolt: Cache DOM elements and text to prevent layout thrashing on search input
+                const cachedCards = Array.from(cards).map(card => ({
+                    element: card,
+                    category: card.dataset.category,
+                    title: card.querySelector('h3').textContent.toLowerCase(),
+                    desc: card.querySelector('p').textContent.toLowerCase()
+                }));
+
                 function filterTools() {
                     let visibleCount = 0;
                     const isSearching = searchQuery.length > 0;
@@ -962,10 +970,9 @@
                         ? activeCategory
                         : activeCategory;
 
-                    cards.forEach(card => {
-                        const category = card.dataset.category;
-                        const title = card.querySelector('h3').textContent.toLowerCase();
-                        const desc = card.querySelector('p').textContent.toLowerCase();
+                    // ⚡ Bolt: Iterate over cached data instead of querying DOM
+                    cachedCards.forEach(cardData => {
+                        const { element, category, title, desc } = cardData;
 
                         const matchesCategory =
                             scopeCategory === 'all' ||
@@ -978,10 +985,10 @@
                             desc.includes(searchQuery);
 
                         if (matchesCategory && matchesSearch) {
-                            card.style.display = 'flex';
+                            element.style.display = 'flex';
                             visibleCount++;
                         } else {
-                            card.style.display = 'none';
+                            element.style.display = 'none';
                         }
                     });
 
